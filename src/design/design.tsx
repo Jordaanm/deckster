@@ -2,13 +2,11 @@ import * as React from 'react';
 import { useStores } from '../stores/util';
 import { CardDesignSelect, renderDesignOption } from './design-select';
 import { Project } from '../stores/project';
-import { MenuItem, Button, Popover, Menu, Position, H1, H2, InputGroup } from '@blueprintjs/core';
+import { MenuItem, Button, Popover, Menu, Position, H1, ControlGroup } from '@blueprintjs/core';
 import { UiStore } from '../stores/ui';
 import { IStores } from '../stores/index';
 import { useObserver } from 'mobx-react-lite';
-import CodeMirror from 'react-codemirror';
-import "codemirror/mode/htmlmixed/htmlmixed";
-import "codemirror/lib/codemirror.css";
+import { DesignEditor } from './design-editor';
 
 const addDesignMenu = (stores: IStores, $fileInput?: HTMLInputElement|null) => {
   const project: Project = stores.project;
@@ -35,11 +33,6 @@ const addDesignMenu = (stores: IStores, $fileInput?: HTMLInputElement|null) => {
   );
 };
 
-const cmOptions = {
-  lineNumbers: true,
-  lineWrapping: true,
-  mode: 'htmlmixed'
-};
 
 export const CardDesigns: React.FC = () => {
   const stores: IStores = useStores();
@@ -53,7 +46,6 @@ export const CardDesigns: React.FC = () => {
     const onItemSelect = console.log.bind(console, "Design Selected");
     const currentDesign = project.getDesign(ui.currentDesign);
     const selectText = currentDesign ? currentDesign.name : 'No Design Selected';
-    const changeName = (e: any) => { if(currentDesign) { currentDesign.name = e.target.value; }};
 
     const loadFile = (e: any) => {
       console.log(e.target.files);
@@ -68,24 +60,12 @@ export const CardDesigns: React.FC = () => {
       }
     };
 
-    const updateCode = (newCode: string) => {
-      const design = project.getDesign(ui.currentDesign);
-      if(design) {
-        design.code = newCode;
-      }
-    };
-
-    const removeCurrentDesign = () => {
-      project.removeDesign(ui.currentDesign || -1);      
-    }
-
     return (
       <section className="app-section card-designs">
         <H1>Card Designs</H1>
-        <div className="row f1">
-          <div className="f1">
-            <div className="row">
-              <H2>Data</H2>
+        <div className="col">
+          <div className="row">
+            <ControlGroup fill={true}>
               <CardDesignSelect
                 items={project.designs}
                 itemRenderer={renderDesignOption}
@@ -104,21 +84,9 @@ export const CardDesigns: React.FC = () => {
               <Popover content={addDesignMenu(stores, $fileInput)} position={Position.RIGHT_TOP}>
                 <Button icon="add" text="Add New Design" />
               </Popover>
-            </div>
-            { currentDesign && <div className="row">
-              <InputGroup large={true} value={currentDesign?.name} onChange={changeName} />
-              <Button icon="delete" text="Remove this Design" onClick={removeCurrentDesign}/>
-            </div> }
-            { currentDesign && <div className="row f1 full-y">
-              <CodeMirror value={currentDesign?.code} onChange={updateCode} options={cmOptions} />
-            </div> }
+            </ControlGroup>
           </div>
-          <div className="f1">
-            <h2>Visual</h2>
-            { currentDesign && 
-              <div className="row full-xy" dangerouslySetInnerHTML={{__html: currentDesign.code}} /> 
-            }
-          </div>
+          <DesignEditor design={currentDesign} />
         </div>
       </section>
     );
