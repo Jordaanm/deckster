@@ -1,5 +1,5 @@
 export interface DataSet {
-  id: number;
+  id: string;
   name: string;
   fieldMappings: string[];
   sheetSource?: string;
@@ -8,7 +8,7 @@ export interface DataSet {
 }
 
 export interface CardDesign {
-  id: number;
+  id: string;
   name: string;
   code: string;
 }

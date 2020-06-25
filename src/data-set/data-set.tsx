@@ -7,6 +7,7 @@ import { Project } from '../stores/project';
 import { UiStore } from '../stores/ui';
 import { DataSetSelect, renderDataSetOption } from './dataset-select';
 import { DataSetEditor } from './data-set-editor';
+import { DataSet } from '../stores/types';
 
 export const DataSets: React.FC = () => {
   const stores: IStores = useStores();
@@ -16,7 +17,7 @@ export const DataSets: React.FC = () => {
 
   return useObserver(() => {
 
-    const onItemSelect = console.log.bind(console, "Data Set Selected");
+    const onItemSelect = (dataSet: DataSet) => ui.currentDataset = dataSet.id;
     const currentDataSet = project.getDataSet(ui.currentDataset);
     const selectText = currentDataSet ? currentDataSet.name : 'No Data Set Selected';
     

@@ -2,8 +2,8 @@ import { decorate, observable } from 'mobx';
 
 export class UiStore {
   currentSection: string = 'design';
-  currentDesign?: number = undefined;
-  currentDataset?: number = undefined;
+  currentDesign?: string = undefined;
+  currentDataset?: string = undefined;
 }
 
 decorate(UiStore, {

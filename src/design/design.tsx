@@ -7,6 +7,7 @@ import { UiStore } from '../stores/ui';
 import { IStores } from '../stores/index';
 import { useObserver } from 'mobx-react-lite';
 import { DesignEditor } from './design-editor';
+import { CardDesign } from '../stores/types';
 
 const addDesignMenu = (stores: IStores, $fileInput?: HTMLInputElement|null) => {
   const project: Project = stores.project;
@@ -43,7 +44,7 @@ export const CardDesigns: React.FC = () => {
 
   return useObserver(() => {
 
-    const onItemSelect = console.log.bind(console, "Design Selected");
+    const onItemSelect = (design: CardDesign) => ui.currentDataset = design.id;
     const currentDesign = project.getDesign(ui.currentDesign);
     const selectText = currentDesign ? currentDesign.name : 'No Design Selected';
 
