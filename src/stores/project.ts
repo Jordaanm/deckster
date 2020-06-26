@@ -59,7 +59,7 @@ export class Project {
       id: nanoid(),
       name: `New DataSet`,
       fields: ['count'],
-      fieldMappings: [],
+      fieldMappings: {},
       data: [{count: 1}, {count:2}],
       sheetData: {
         apiKey: '',

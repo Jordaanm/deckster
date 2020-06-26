@@ -9,6 +9,8 @@ import { DataSetSelect, renderDataSetOption } from './dataset-select';
 import { DataSetEditor } from './data-set-editor';
 import { DataSet } from '../stores/types';
 
+import "./data-set.scss"
+
 export const DataSets: React.FC = () => {
   const stores: IStores = useStores();
   

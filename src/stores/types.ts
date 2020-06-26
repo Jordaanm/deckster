@@ -1,7 +1,6 @@
-export interface FieldMapping {
-  index: number,
-  fieldName: string
-}
+interface FieldMappings {
+  [key: string]: number
+};
 
 export interface SheetData {
   source: string;
@@ -13,7 +12,7 @@ export interface DataSet {
   id: string;
   name: string;
   fields: string[];
-  fieldMappings: FieldMapping[];
+  fieldMappings: FieldMappings;
   sheetData: SheetData
   data: any[];
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button, ControlGroup, InputGroup, ButtonGroup, Dialog } from '@blueprintjs/core';
+import { H2, EditableText, Button, ControlGroup, InputGroup, ButtonGroup, Dialog, TagInput } from '@blueprintjs/core';
 import { Table, Column, EditableCell} from '@blueprintjs/table';
 import { DataSet } from '../stores/types';
 import { IStores } from '../stores/index';
@@ -23,11 +23,9 @@ const getKeys = (dataSet: DataSet): string[] => {
 }
 
 const getCellRenderer = (dataSet: DataSet, key: string) => {
-  console.log("GetCellRenderer", dataSet.data, key);
   return (row: number) => {
     let entry = dataSet.data[row][key];
-    console.log("Entry", entry, dataSet.data, row, key);
-    return (<EditableCell>{entry}</EditableCell>);
+    return (<EditableCell value={entry} />);
   };
 }
 
@@ -53,7 +51,14 @@ export const DataSetEditor: React.FC<DataSetEditorProps> = (props) => {
     
     const changeName = (text: string) => { if(dataSet) { dataSet.name = text; }};
     const remove = () => project.removeDataSet(dataSet.id);
-    const saveImport = () => toggleDialog();
+    const saveImport = (data: object[]|null) => { 
+      if(data) { dataSet.data = data; }
+      toggleDialog();
+    }
+    const fieldChange = (values: React.ReactNode[]) => {
+      dataSet.fields = values.map(x => x?.toString() || '').filter(Boolean).map(x => x.replace(/[^\w]/g, ''));
+      return true; 
+    };
 
     return (
       <section className="row editor">
@@ -66,15 +71,14 @@ export const DataSetEditor: React.FC<DataSetEditorProps> = (props) => {
             </ButtonGroup>
           </div>
           <div className="row">
-            Field Mappings
-          </div>
-          <div className="row">
-            <ControlGroup>
-              <Button text="Edit Field Mappings" icon="code" />
-              <InputGroup placeholder="Google Sheet ID" leftIcon="id-number" />
-              <InputGroup placeholder="Google API Key"  leftIcon="key" />
-              <Button text="Fetch Data" icon="download" />
-            </ControlGroup>
+            <TagInput 
+              large={true}
+              values={dataSet.fields}
+              addOnBlur={true}
+              addOnPaste={true}
+              onChange={fieldChange}
+              leftIcon="manually-entered-data"
+            />
           </div>
           <div className="row">
             <Table
@@ -88,7 +92,13 @@ export const DataSetEditor: React.FC<DataSetEditorProps> = (props) => {
             </Table>
           </div>
         </div>
-        <Dialog isOpen={dialogIsOpen} icon="import" title="Import From Google Sheets" onClose={toggleDialog}>
+        <Dialog
+          isOpen={dialogIsOpen}
+          icon="import"
+          title="Import From Google Sheets"
+          className="dialog--wide"
+          onClose={toggleDialog}
+        >
           <ImportSheet closeFn={toggleDialog} save={saveImport} dataSet={dataSet} />
         </Dialog>
       </section>
