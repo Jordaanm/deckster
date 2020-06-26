@@ -1,9 +1,20 @@
+export interface FieldMapping {
+  index: number,
+  fieldName: string
+}
+
+export interface SheetData {
+  source: string;
+  apiKey: string;
+  range: string;
+}
+
 export interface DataSet {
   id: string;
   name: string;
-  fieldMappings: string[];
-  sheetSource?: string;
-  sheetApiKey?: string;
+  fields: string[];
+  fieldMappings: FieldMapping[];
+  sheetData: SheetData
   data: any[];
 }
 

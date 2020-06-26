@@ -19,8 +19,14 @@ export class Project {
     const newDataSet: DataSet = {
       id: nanoid(),
       name: `New DataSet`,
+      fields: ['count'],
       fieldMappings: [],
-      data: []
+      data: [{count: 1}, {count:2}],
+      sheetData: {
+        apiKey: '',
+        range: '',
+        source: ''
+      }
     }
 
     this.data.push(newDataSet);

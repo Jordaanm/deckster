@@ -6,6 +6,7 @@ import { CardDesigns } from '../design/design';
 import { DataSets } from '../data-set/data-set';
 
 import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/table/lib/css/table.css";
 import './app.scss'
 
 const AppContainer = (props) => {
