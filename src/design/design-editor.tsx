@@ -43,7 +43,7 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
       <section className="row editor">
         <div className="f1 col">
           <div className="row">
-            <H2><EditableText onEdit={changeName} value={design?.name} /></H2>
+            <H2><EditableText onChange={changeName} value={design.name} /></H2>
             <Button icon="delete" text="Remove this Design" onClick={removeDesign}/>
           </div>
           <div className="row f1 full-y">

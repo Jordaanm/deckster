@@ -44,7 +44,7 @@ export const CardDesigns: React.FC = () => {
 
   return useObserver(() => {
 
-    const onItemSelect = (design: CardDesign) => ui.currentDataset = design.id;
+    const onItemSelect = (design: CardDesign) => ui.currentDesign = design.id;
     const currentDesign = project.getDesign(ui.currentDesign);
     const selectText = currentDesign ? currentDesign.name : 'No Design Selected';
 

@@ -64,7 +64,7 @@ export const DataSetEditor: React.FC<DataSetEditorProps> = (props) => {
       <section className="row editor">
         <div className="f1 col">
           <div className="row">
-            <H2><EditableText onEdit={changeName} value={dataSet.name} /></H2>
+            <H2><EditableText onChange={changeName} value={dataSet.name} /></H2>
             <ButtonGroup>
               <Button icon="delete" text="Remove this Design" onClick={remove} />
               <Button icon="import" text="Import Data" onClick={toggleDialog} />

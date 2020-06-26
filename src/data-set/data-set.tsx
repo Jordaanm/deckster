@@ -16,17 +16,17 @@ export const DataSets: React.FC = () => {
   
   const project: Project = stores.project;
   const ui: UiStore = stores.ui;
+    
+  const addNewDataSet = () => {
+    const dataset = project.addNewDataSet();
+    ui.currentDataset = dataset.id;
+  };
 
   return useObserver(() => {
 
     const onItemSelect = (dataSet: DataSet) => ui.currentDataset = dataSet.id;
     const currentDataSet = project.getDataSet(ui.currentDataset);
     const selectText = currentDataSet ? currentDataSet.name : 'No Data Set Selected';
-    
-    const addNewDataSet = () => {
-      const dataset = project.addNewDataSet();
-      ui.currentDataset = dataset.id;
-    };
     
     return (
       <section className="app-section card-designs">
