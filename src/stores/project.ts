@@ -1,10 +1,50 @@
-import { decorate, observable } from "mobx";
+import { decorate, observable, toJS } from "mobx";
 import { DataSet, CardDesign } from './types';
 import { nanoid } from 'nanoid';
 
 export class Project {
+  static LOCALSTORAGE_KEY = "project";
+  
   data: DataSet[] = [];
   designs: CardDesign[] = [];
+  name: string = "My Project";
+  
+  intervalId: number = -1;
+
+  static loadFromLocalStorage(): Project {
+    const project = new Project();
+
+    const serialised = localStorage?.getItem(Project.LOCALSTORAGE_KEY);
+    if(serialised) {
+      try {
+        const deserial = JSON.parse(serialised);
+        
+        project.name = deserial.name;
+        project.designs = [ ...deserial.designs ];
+        project.data = [ ...deserial.data ];
+      } catch {
+        console.error("Unable to load Project store from local storage");
+      }
+    }
+
+    return project;
+  }
+
+  saveToLocalStorage(): void {
+    const serialised = JSON.stringify({
+      name: toJS(this.name),
+      designs: toJS(this.designs),
+      data: toJS(this.data)
+    });
+    console.log("Saving to LocalStorage", serialised, this);
+    localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);
+  }
+
+  autoSave(period: number = 15000): void {
+    if(this.intervalId !== -1) { clearInterval(this.intervalId); }
+    this.saveToLocalStorage();
+    this.intervalId = window.setInterval(() => this.saveToLocalStorage(), period);
+  }
 
   getDataSet(id?: string) {
     return this.data.find(x => x.id === id);
@@ -13,7 +53,6 @@ export class Project {
   getDesign(id?: string) {
     return this.designs.find(x => x.id === id);
   }
-
 
   addNewDataSet() {
     const newDataSet: DataSet = {
@@ -61,5 +100,6 @@ export class Project {
 
 decorate(Project, {
   data: observable,
-  designs: observable
+  designs: observable,
+  name: observable
 });

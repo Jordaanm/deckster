@@ -8,7 +8,7 @@ export interface IStores {
 
 export const Stores: IStores = {
   ui: new UiStore(),
-  project: new Project()
+  project: Project.loadFromLocalStorage()
 };
 
 (window as any)['stores'] = Stores;

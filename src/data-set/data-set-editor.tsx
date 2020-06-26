@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button, ControlGroup, InputGroup, Overlay, ButtonGroup, Card, Dialog } from '@blueprintjs/core';
+import { H2, EditableText, Button, ControlGroup, InputGroup, ButtonGroup, Dialog } from '@blueprintjs/core';
 import { Table, Column, EditableCell} from '@blueprintjs/table';
 import { DataSet } from '../stores/types';
 import { IStores } from '../stores/index';

@@ -10,7 +10,8 @@ import "@blueprintjs/table/lib/css/table.css";
 import './app.scss'
 
 const AppContainer = (props) => {
-  const {ui} = useStores();
+  const {ui, project} = useStores();
+  React.useEffect(() => project.autoSave());
 
   return useObserver(() => {
     const tabChange = id => ui.currentSection = id;
