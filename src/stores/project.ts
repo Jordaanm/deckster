@@ -1,5 +1,5 @@
 import { decorate, observable, toJS } from "mobx";
-import { DataSet, CardDesign } from './types';
+import { DataSet, CardDesign, Transform } from './types';
 import { nanoid } from 'nanoid';
 
 export class Project {
@@ -7,6 +7,7 @@ export class Project {
   
   data: DataSet[] = [];
   designs: CardDesign[] = [];
+  transforms: Transform[] = [];
   name: string = "My Project";
   
   intervalId: number = -1;
@@ -22,6 +23,7 @@ export class Project {
         project.name = deserial.name;
         project.designs = [ ...deserial.designs ];
         project.data = [ ...deserial.data ];
+        project.transforms = [ ...deserial.transforms ];
       } catch {
         console.error("Unable to load Project store from local storage");
       }
@@ -34,7 +36,8 @@ export class Project {
     const serialised = JSON.stringify({
       name: toJS(this.name),
       designs: toJS(this.designs),
-      data: toJS(this.data)
+      data: toJS(this.data),
+      transforms: toJS(this.transforms)
     });
     console.log("Saving to LocalStorage", serialised, this);
     localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);
@@ -52,6 +55,10 @@ export class Project {
 
   getDesign(id?: string) {
     return this.designs.find(x => x.id === id);
+  }
+
+  getTransform(id?: string) {
+    return this.transforms.find(x => x.id === id);
   }
 
   addNewDataSet() {
@@ -83,6 +90,17 @@ export class Project {
     return newDesign;
   }
 
+  addNewTransform() {
+    const newTransform: Transform = {
+      id: nanoid(),
+      name: 'New Transform',
+      steps: []
+    }
+
+    this.transforms.push(newTransform);
+    return newTransform;
+  }
+
   removeDesign(id: string) {
     const index = this.designs.findIndex(x => x.id === id);
     if (index !== -1) {
@@ -96,10 +114,19 @@ export class Project {
       this.data.splice(index, 1);
     }
   }
+
+  removeTransform(id: string) {
+    const index = this.transforms.findIndex(x => x.id === id);
+    if (index !== -1) {
+      this.transforms.splice(index, 1);
+    }
+  }
+
 }
 
 decorate(Project, {
   data: observable,
   designs: observable,
+  transforms: observable,
   name: observable
 });

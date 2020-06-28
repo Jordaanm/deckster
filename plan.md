@@ -55,3 +55,10 @@
 ### UI Store (do not save)
 * Google API Key
 * Current Page/Section
+
+
+# TODO
+
+* Images/Icons
+* Data Transformation
+* Template Rendering

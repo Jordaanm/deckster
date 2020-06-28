@@ -9,6 +9,8 @@ import { useObserver } from 'mobx-react-lite';
 import { DesignEditor } from './design-editor';
 import { CardDesign } from '../stores/types';
 
+import './design.scss';
+
 const addDesignMenu = (stores: IStores, $fileInput?: HTMLInputElement|null) => {
   const project: Project = stores.project;
   const ui: UiStore = stores.ui;

@@ -29,11 +29,13 @@ html, body, #root, .app {
 .row {
   display: flex;
   flex-direction: row;
+  margin-top: 0.5em;
 }
 
 .col {
   display: flex;
   flex-direction: column;
+  margin-left: 0.5em;
 }
 
 .f1 {
