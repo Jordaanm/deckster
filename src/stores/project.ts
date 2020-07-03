@@ -1,5 +1,5 @@
 import { decorate, observable, toJS } from "mobx";
-import { DataSet, CardDesign, Transform } from './types';
+import { DataSet, CardDesign, Transform, TxOperation, TxStep } from './types';
 import { nanoid } from 'nanoid';
 
 export class Project {
@@ -122,6 +122,15 @@ export class Project {
     }
   }
 
+  createStep(fields: { params: string[]; operation: TxOperation; }): TxStep {
+    const { params, operation } = fields;
+
+    return {
+      id: nanoid(),
+      operation,
+      params
+    } as TxStep;
+  }
 }
 
 decorate(Project, {

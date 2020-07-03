@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MenuItem, Button, Popover, Menu, Position, H1, ControlGroup } from '@blueprintjs/core';
+import { MenuItem, Button, H1, ControlGroup } from '@blueprintjs/core';
 import { useObserver } from 'mobx-react-lite';
 import { useStores } from '../stores/util';
 import { Project } from '../stores/project';
@@ -7,7 +7,7 @@ import { UiStore } from '../stores/ui';
 import { IStores } from '../stores/index';
 import { TransformSelect, renderTxOption } from './transform-select';
 import { TransformEditor } from './transform-editor';
-import { Transform, TxStep, TxOperation } from '../stores/types';
+import { Transform } from '../stores/types';
 
 // import './transform.scss';
 
@@ -16,7 +16,7 @@ export const Transforms: React.FC = () => {
 
   const project: Project = stores.project;
   const ui: UiStore = stores.ui;
-    
+
   const addNewTx = () => {
     const tx = project.addNewTransform();
     ui.currentTransform = tx.id;

@@ -29,10 +29,11 @@ export interface Transform {
   steps: TxStep[];
 }
 
-export type TxOpParam = string|number;
+export type TxValue = string|number;
 
 export interface TxStep {
-  params: TxOpParam[]
+  id: string;
+  params: string[];
   operation: TxOperation;
 }
 
@@ -42,8 +43,10 @@ export enum TxType {
 }
 
 export interface TxOperation {
-  name: string,
-  input: TxType,
-  output: TxType,
-  pipe(value: TxOpParam, params: (TxOpParam)[]): TxOpParam;
+  name: string;
+  description?: string;
+  input: TxType;
+  output: TxType;
+  paramNames: string[];
+  pipe(value: TxValue, params: string[]): TxValue;
 }
