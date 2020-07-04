@@ -1,5 +1,14 @@
 import { TxOperation, TxType } from '../stores/types';
 
+export const identity: TxOperation = {
+  name: 'Identity',
+  description: 'Returns the same value it is given',
+  input: TxType.STRING,
+  output: TxType.STRING,
+  paramNames: [],
+  pipe: (value) => value
+};
+
 export const parseInteger: TxOperation = {
   name: 'Parse Integer',
   description: 'Convert a String into a Number',

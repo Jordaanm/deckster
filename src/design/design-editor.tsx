@@ -7,7 +7,7 @@ import { useStores } from '../stores/util';
 import { IStores } from '../stores/index';
 
 import "ace-builds/src-noconflict/mode-html";
-import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-monokai";
 
 interface DesignEditorProps {
   design?:  CardDesign;
@@ -79,7 +79,7 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
           <div className="row f1 full-y">
             <AceEditor
               mode="html"
-              theme="github"
+              theme="monokai"
               onChange={updateCode}
               name={`DesignEditor${design.id}`}
               editorProps={{ $blockScrolling: true }}
