@@ -50,7 +50,7 @@ export const DataSetEditor: React.FC<DataSetEditorProps> = (props) => {
     if (!dataSet) { return null; }
     
     const changeName = (text: string) => { if(dataSet) { dataSet.name = text; }};
-    const remove = () => project.removeDataSet(dataSet.id);
+    const remove = () => project.datasets.remove(dataSet.id);
     const saveImport = (data: object[]|null) => { 
       if(data) { dataSet.data = data; }
       toggleDialog();

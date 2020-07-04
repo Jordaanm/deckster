@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TxStep } from '../stores/types';
 import { useObserver } from 'mobx-react-lite';
-import { Card, H3, H5 } from '@blueprintjs/core';
+import { Card, H3 } from '@blueprintjs/core';
 
 export interface TransformStepProps {
   step: TxStep

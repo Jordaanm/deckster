@@ -17,7 +17,7 @@ const addDesignMenu = (stores: IStores, $fileInput?: HTMLInputElement|null) => {
 
   const addNewDesign = () => {
     console.log("Hello");
-    const design = project.addNewDesign();
+    const design = project.designs.addNew();
     ui.currentDesign = design.id;
   };
 
@@ -47,7 +47,7 @@ export const CardDesigns: React.FC = () => {
   return useObserver(() => {
 
     const onItemSelect = (design: CardDesign) => ui.currentDesign = design.id;
-    const currentDesign = project.getDesign(ui.currentDesign);
+    const currentDesign = project.designs.find(ui.currentDesign);
     const selectText = currentDesign ? currentDesign.name : 'No Design Selected';
 
     const loadFile = (e: any) => {
@@ -56,7 +56,8 @@ export const CardDesigns: React.FC = () => {
         var reader = new FileReader();
         reader.onload = function(){
           var dataURL = reader.result;       
-          const design = project.addNewDesign(dataURL?.toString());
+          const design = project.designs.addNew();
+          design.code = dataURL?.toString() || '';
           ui.currentDesign = design.id;
         };
         reader.readAsText(e.target.files[0]);  
@@ -70,7 +71,7 @@ export const CardDesigns: React.FC = () => {
           <div className="row">
             <ControlGroup fill={true}>
               <CardDesignSelect
-                items={project.designs}
+                items={project.designs.items}
                 itemRenderer={renderDesignOption}
                 noResults={<MenuItem disabled={true} text="No Designs Added" />}
                 onItemSelect={onItemSelect}

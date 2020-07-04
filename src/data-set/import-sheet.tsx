@@ -2,8 +2,8 @@ import * as React from 'react';
 import { useObserver } from 'mobx-react-lite';
 import { H2, ButtonGroup, Button, InputGroup, Card, Classes, H3 } from '@blueprintjs/core';
 import { DataSet, SheetData } from '../stores/types';
-import CodeMirror from 'react-codemirror';
 import { Table, Column, EditableCell } from '@blueprintjs/table';
+import ReactAce from 'react-ace/lib/ace';
 
 interface ImportSheetProps {
   closeFn: () => void;
@@ -77,7 +77,7 @@ export const ImportSheet: React.FC<ImportSheetProps> = (props) => {
             <Button text="Fetch Data" icon="download" onClick={() => fetchData(sheetData, setImportedData)} />
           </ButtonGroup>
           {importedData && <div>
-            <CodeMirror value={JSON.stringify(importedData, null, 2)} />
+            <ReactAce value={JSON.stringify(importedData, null, 2)} />
             <H3>Field Mappings</H3>
             <Table numRows={1}>
               {generateColumns(dataSet)}
@@ -85,7 +85,7 @@ export const ImportSheet: React.FC<ImportSheetProps> = (props) => {
             <Button icon="translate" onClick={transformData}>Transform Data</Button>
           </div>}
           {txData && <div>
-            <CodeMirror value={JSON.stringify(txData, null, 2)} />
+            <ReactAce value={JSON.stringify(txData, null, 2)} />
           </div>}
 
         </div>

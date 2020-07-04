@@ -18,14 +18,14 @@ export const DataSets: React.FC = () => {
   const ui: UiStore = stores.ui;
     
   const addNewDataSet = () => {
-    const dataset = project.addNewDataSet();
+    const dataset = project.datasets.addNew();
     ui.currentDataset = dataset.id;
   };
 
   return useObserver(() => {
 
     const onItemSelect = (dataSet: DataSet) => ui.currentDataset = dataSet.id;
-    const currentDataSet = project.getDataSet(ui.currentDataset);
+    const currentDataSet = project.datasets.find(ui.currentDataset);
     const selectText = currentDataSet ? currentDataSet.name : 'No Data Set Selected';
     
     return (
@@ -35,7 +35,7 @@ export const DataSets: React.FC = () => {
           <div className="row">
             <ControlGroup fill={true}>
               <DataSetSelect
-                items={project.data}
+                items={project.datasets.items}
                 itemRenderer={renderDataSetOption}
                 noResults={<MenuItem disabled={true} text="No Data Sets Added" />}
                 onItemSelect={onItemSelect}

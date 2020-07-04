@@ -1,24 +1,17 @@
 import * as React from 'react';
 import { CardDesign } from '../stores/types';
 import { useObserver } from 'mobx-react-lite';
-import CodeMirror from 'react-codemirror';
+import AceEditor from "react-ace";
 import { Button, H2, EditableText, Tag } from '@blueprintjs/core';
 import { useStores } from '../stores/util';
 import { IStores } from '../stores/index';
 
-import "codemirror/mode/htmlmixed/htmlmixed";
-import "codemirror/lib/codemirror.css";
-
+import "ace-builds/src-noconflict/mode-html";
+import "ace-builds/src-noconflict/theme-github";
 
 interface DesignEditorProps {
   design?:  CardDesign;
 }
-
-const cmOptions = {
-  lineNumbers: true,
-  lineWrapping: true,
-  mode: 'htmlmixed'
-};
 
 const enterEditMode = (host: HTMLElement) => {
   host.classList.add('edit-mode');
@@ -36,6 +29,8 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
     const { design } = props;
     if(!design) { return null; }
 
+    const {code} = design;
+
     const changeName = (text: string) => { if(design) { design.name = text; }};
 
     const updateCode = (newCode: string) => {
@@ -45,9 +40,9 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
 
     const onSvgLoaded = ($div: HTMLDivElement|null) => {
       setSvgHost($div);
-      setTimeout(() => {
-        scanForFields($div);
-      }, 1000);
+      // setTimeout(() => {
+      //   scanForFields($div);
+      // }, 1000);
     }
 
     const scanForFields = (svgHost: HTMLDivElement|null) => {
@@ -62,7 +57,7 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
     };
 
     const removeDesign = () => {
-      project.removeDesign(design.id);      
+      project.designs.remove(design.id);      
     }
 
     const tagElement = () => {
@@ -70,6 +65,8 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
         enterEditMode(svgHost);
       }
     }
+
+    console.log("Design Editor Render", design.code, design);
 
     return (
       <section className="row editor">
@@ -80,7 +77,14 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
             <Button icon="search-template" text="Tag Section" onClick={tagElement} />
           </div>
           <div className="row f1 full-y">
-            <CodeMirror value={design?.code} onChange={updateCode} options={cmOptions} />
+            <AceEditor
+              mode="html"
+              theme="github"
+              onChange={updateCode}
+              name={`DesignEditor${design.id}`}
+              editorProps={{ $blockScrolling: true }}
+              value={code}
+            />
           </div>
           {placeholders && placeholders.length > 0 && <div className="row">
             Identified Fields:

@@ -18,14 +18,14 @@ export const Transforms: React.FC = () => {
   const ui: UiStore = stores.ui;
 
   const addNewTx = () => {
-    const tx = project.addNewTransform();
+    const tx = project.transforms.addNew();
     ui.currentTransform = tx.id;
   };
 
   return useObserver(() => {
 
     const onItemSelect = (tx: Transform) => ui.currentTransform = tx.id;
-    const currentTx = project.getTransform(ui.currentTransform);
+    const currentTx = project.transforms.find(ui.currentTransform);
     const selectText = currentTx ? currentTx.name : 'No Transform Selected';
  
     return (
@@ -35,7 +35,7 @@ export const Transforms: React.FC = () => {
           <div className="row">
             <ControlGroup fill={true}>
               <TransformSelect
-                items={project.transforms}
+                items={project.transforms.items}
                 itemRenderer={renderTxOption}
                 noResults={<MenuItem disabled={true} text="No Transforms Added" />}
                 onItemSelect={onItemSelect}

@@ -26,7 +26,7 @@ export const TransformEditor: React.FC<TransformEditorProps> = props => {
     const changeName = (text: string) => { if(transform) { transform.name = text; }};
 
     const removeTransform = () => {
-      project.removeTransform(transform.id);      
+      project.transforms.remove(transform.id);      
     }
 
     const saveStep = (step?: TxStep) => {
