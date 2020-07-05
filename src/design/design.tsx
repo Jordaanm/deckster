@@ -41,13 +41,14 @@ export const CardDesigns: React.FC = () => {
     const currentDesign = project.designs.currentItem;
 
     const loadFile = (e: any) => {
-      console.log(e.target.files);
       if(e?.target?.files?.length > 0) {
         var reader = new FileReader();
         reader.onload = function(){
-          var dataURL = reader.result;       
-          const design = project.designs.addNew(true);
-          design.code = dataURL?.toString() || '';
+          var dataURL = reader.result;
+          const code = dataURL?.toString();
+          if (code) {
+            project.designs.addNew(true, {code});
+          }
         };
         reader.readAsText(e.target.files[0]);  
       }

@@ -12,7 +12,7 @@ export class TransformStore extends EntityStore<Transform> {
     return "transforms";
   }
 
-  public createFromGuid(guid: string): Transform {
+  public createFromGuid(guid: string, fields: any): Transform {
     return {
       id: guid,
       name: 'New Transform',

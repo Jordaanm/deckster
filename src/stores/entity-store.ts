@@ -9,7 +9,7 @@ export abstract class EntityStore<T extends IEntity> {
   
   public abstract get entityName(): string;
   public abstract get label(): string;
-  public abstract createFromGuid(guid: string): T;
+  public abstract createFromGuid(guid: string, fields: any): T;
   
   public save(): any {
     const json = {
@@ -24,9 +24,9 @@ export abstract class EntityStore<T extends IEntity> {
     this.items.push(...data.items);
   }
 
-  public create(): T {
+  public create(fields: any = {}): T {
     const guid = nanoid();
-    return this.createFromGuid(guid);
+    return this.createFromGuid(guid, fields);
   }
 
   public remove(id: string) {
@@ -40,8 +40,8 @@ export abstract class EntityStore<T extends IEntity> {
     this.items.push(item);
   }
 
-  public addNew(setAsCurrent: boolean): T {
-    const item = this.create();
+  public addNew(setAsCurrent: boolean, fields: any = {}): T {
+    const item = this.create(fields);
     this.add(item);
     if(setAsCurrent) {
       this.currentlySelectedID = item.id;

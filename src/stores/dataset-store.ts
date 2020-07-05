@@ -12,7 +12,7 @@ export class DataSetStore extends EntityStore<DataSet> {
     return "datasets";
   }
 
-  public createFromGuid(guid: string): DataSet {
+  public createFromGuid(guid: string, fields: any): DataSet {
     return {
       id: guid,
       name: 'New Dataset',

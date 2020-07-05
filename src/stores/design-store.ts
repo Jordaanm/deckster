@@ -12,11 +12,11 @@ export class DesignStore extends EntityStore<CardDesign> {
     return "designs";
   }
 
-  public createFromGuid(guid: string): CardDesign {
+  public createFromGuid(guid: string, fields: any): CardDesign {
     return {
       id: guid,
       name: 'New Design',
-      code: ''
+      code: fields?.code || ''
     };
   }
 }
