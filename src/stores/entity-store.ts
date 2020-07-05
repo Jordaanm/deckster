@@ -4,21 +4,20 @@ import { IEntity } from './types';
 
 export abstract class EntityStore<T extends IEntity> {
   
-  protected currentlySelectedID: string = "";
-
-  protected abstract get _items(): T[];
-
+  public currentlySelectedID: string = "";
+  public items: T[] = [];
+  
   public abstract get entityName(): string;
+  public abstract get label(): string;
   public abstract createFromGuid(guid: string): T;
   
-  
-  public save(): any {
-    const json = toJS(this._items);
+    public save(): any {
+    const json = toJS(this.items);
     return json;
   };
 
   public load(data: any): void {
-    this._items.push(...data.items);
+    this.items.push(...data.items);
   }
 
   public create(): T {
@@ -27,27 +26,30 @@ export abstract class EntityStore<T extends IEntity> {
   }
 
   public remove(id: string) {
-    const index = this._items.findIndex((x: IEntity) => x.id === id);
+    const index = this.items.findIndex((x: IEntity) => x.id === id);
     if (index !== -1) {
-      this._items.splice(index, 1);
+      this.items.splice(index, 1);
     }
   }
   
   public add(item: T): void {
-    this._items.push(item);
+    this.items.push(item);
   }
 
-  public addNew(): T {
+  public addNew(setAsCurrent: boolean): T {
     const item = this.create();
     this.add(item);
+    if(setAsCurrent) {
+      this.currentlySelectedID = item.id;
+    }
     return item;
   }
 
   public find(id?: string): T|undefined {
-    return this._items.find(x => x.id === id);
+    return this.items.find(x => x.id === id);
   }
   
   public get currentItem(): T|undefined {
-    return this._items.find(x => x.id === this.currentlySelectedID);
+    return this.items.find(x => x.id === this.currentlySelectedID);
   }
 }

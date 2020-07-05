@@ -2,31 +2,25 @@ import * as React from 'react';
 import { useObserver} from 'mobx-react-lite';
 import { useStores } from '../stores/util';
 import { IStores } from '../stores/index';
-import { H1, ControlGroup, MenuItem, Button } from '@blueprintjs/core';
+import { H1, ControlGroup, Button } from '@blueprintjs/core';
 import { Project } from '../stores/project';
-import { UiStore } from '../stores/ui';
-import { DataSetSelect, renderDataSetOption } from './dataset-select';
 import { DataSetEditor } from './data-set-editor';
-import { DataSet } from '../stores/types';
 
 import "./data-set.scss"
+import { entitySelect } from '../app/entity-select';
 
 export const DataSets: React.FC = () => {
   const stores: IStores = useStores();
   
   const project: Project = stores.project;
-  const ui: UiStore = stores.ui;
     
   const addNewDataSet = () => {
-    const dataset = project.datasets.addNew();
-    ui.currentDataset = dataset.id;
+    project.datasets.addNew(true);
   };
 
   return useObserver(() => {
 
-    const onItemSelect = (dataSet: DataSet) => ui.currentDataset = dataSet.id;
-    const currentDataSet = project.datasets.find(ui.currentDataset);
-    const selectText = currentDataSet ? currentDataSet.name : 'No Data Set Selected';
+    const currentDataSet = project.datasets.currentItem;
     
     return (
       <section className="app-section card-designs">
@@ -34,14 +28,7 @@ export const DataSets: React.FC = () => {
         <div className="col">
           <div className="row">
             <ControlGroup fill={true}>
-              <DataSetSelect
-                items={project.datasets.items}
-                itemRenderer={renderDataSetOption}
-                noResults={<MenuItem disabled={true} text="No Data Sets Added" />}
-                onItemSelect={onItemSelect}
-              >        
-                <Button text={selectText} rightIcon="double-caret-vertical" />
-              </DataSetSelect>
+              {entitySelect(project.datasets)}
               <Button icon="add" text="Add New Data Set" onClick={addNewDataSet}/>
             </ControlGroup>
           </div>

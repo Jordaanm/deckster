@@ -1,28 +1,21 @@
 import * as React from 'react';
 import { useStores } from '../stores/util';
-import { CardDesignSelect, renderDesignOption } from './design-select';
 import { Project } from '../stores/project';
 import { MenuItem, Button, Popover, Menu, Position, H1, ControlGroup } from '@blueprintjs/core';
-import { UiStore } from '../stores/ui';
 import { IStores } from '../stores/index';
 import { useObserver } from 'mobx-react-lite';
 import { DesignEditor } from './design-editor';
-import { CardDesign } from '../stores/types';
 
 import './design.scss';
+import { entitySelect } from '../app/entity-select';
+import { DesignStore } from '../stores/design-store';
 
-const addDesignMenu = (stores: IStores, $fileInput?: HTMLInputElement|null) => {
-  const project: Project = stores.project;
-  const ui: UiStore = stores.ui;
-
+const addDesignMenu = (designs: DesignStore, $fileInput?: HTMLInputElement|null) => {
   const addNewDesign = () => {
-    console.log("Hello");
-    const design = project.designs.addNew();
-    ui.currentDesign = design.id;
+    designs.addNew(true);
   };
 
   const triggerFile = () => {
-    console.log("LoadFile");
     if($fileInput) {
       $fileInput.click();
     }
@@ -42,13 +35,10 @@ export const CardDesigns: React.FC = () => {
   const [$fileInput, setFileInput] = React.useState<HTMLInputElement|null>();
 
   const project: Project = stores.project;
-  const ui: UiStore = stores.ui;
 
   return useObserver(() => {
 
-    const onItemSelect = (design: CardDesign) => ui.currentDesign = design.id;
-    const currentDesign = project.designs.find(ui.currentDesign);
-    const selectText = currentDesign ? currentDesign.name : 'No Design Selected';
+    const currentDesign = project.designs.currentItem;
 
     const loadFile = (e: any) => {
       console.log(e.target.files);
@@ -56,9 +46,8 @@ export const CardDesigns: React.FC = () => {
         var reader = new FileReader();
         reader.onload = function(){
           var dataURL = reader.result;       
-          const design = project.designs.addNew();
+          const design = project.designs.addNew(true);
           design.code = dataURL?.toString() || '';
-          ui.currentDesign = design.id;
         };
         reader.readAsText(e.target.files[0]);  
       }
@@ -70,14 +59,7 @@ export const CardDesigns: React.FC = () => {
         <div className="col">
           <div className="row">
             <ControlGroup fill={true}>
-              <CardDesignSelect
-                items={project.designs.items}
-                itemRenderer={renderDesignOption}
-                noResults={<MenuItem disabled={true} text="No Designs Added" />}
-                onItemSelect={onItemSelect}
-              >        
-                <Button text={selectText} rightIcon="double-caret-vertical" />
-              </CardDesignSelect>
+              {entitySelect(project.designs)}
               <input
                 type="file"
                 accept=".svg"
@@ -85,7 +67,7 @@ export const CardDesigns: React.FC = () => {
                 onChange={loadFile}
                 className="hidden"
               />
-              <Popover content={addDesignMenu(stores, $fileInput)} position={Position.RIGHT_TOP}>
+              <Popover content={addDesignMenu(project.designs, $fileInput)} position={Position.RIGHT_TOP}>
                 <Button icon="add" text="Add New Design" />
               </Popover>
             </ControlGroup>

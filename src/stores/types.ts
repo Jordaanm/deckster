@@ -4,6 +4,22 @@ interface FieldMappings {
 
 export interface IEntity {
   id: string;
+  name: string;
+}
+
+export interface DataSet extends IEntity {
+  fields: string[];
+  fieldMappings: FieldMappings;
+  sheetData: SheetData
+  data: any[];
+}
+
+export interface CardDesign extends IEntity {
+  code: string;
+}
+
+export interface Transform extends IEntity {
+  steps: TxStep[];
 }
 
 export interface SheetData {
@@ -12,27 +28,10 @@ export interface SheetData {
   range: string;
 }
 
-export interface DataSet extends IEntity {
-  name: string;
-  fields: string[];
-  fieldMappings: FieldMappings;
-  sheetData: SheetData
-  data: any[];
-}
-
-export interface CardDesign extends IEntity {
-  name: string;
-  code: string;
-}
-
-export interface Transform extends IEntity {
-  name: string;
-  steps: TxStep[];
-}
-
 export type TxValue = string|number;
 
-export interface TxStep extends IEntity {
+export interface TxStep {
+  id: string;
   params: string[];
   operation: TxOperation;
 }

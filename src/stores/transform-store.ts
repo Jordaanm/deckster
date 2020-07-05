@@ -4,11 +4,10 @@ import { EntityStore } from './entity-store';
 
 export class TransformStore extends EntityStore<Transform> {
 
-  public items: Transform[] = [];
-
-  protected get _items(): Transform[] {
-    return this.items;
+  public get label(): string {
+    return "Transforms";
   }
+  
   public get entityName(): string {
     return "transforms";
   }
@@ -23,5 +22,6 @@ export class TransformStore extends EntityStore<Transform> {
 }
 
 decorate(TransformStore, {
-  items: observable
+  items: observable,
+  currentlySelectedID: observable
 });

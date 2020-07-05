@@ -1,9 +1,10 @@
 import { decorate, observable, toJS } from "mobx";
-import { TxOperation, TxStep } from './types';
+import { TxOperation, TxStep, IEntity } from './types';
 import { nanoid } from 'nanoid';
 import { DesignStore } from './design-store';
 import { DataSetStore } from './dataset-store';
 import { TransformStore } from './transform-store';
+import { EntityStore } from './entity-store';
 
 export class Project {
   static LOCALSTORAGE_KEY = "project";
@@ -33,6 +34,16 @@ export class Project {
     }
 
     return project;
+  }
+
+  getStore<T extends IEntity>(type: any): EntityStore<T>|null {
+    const key = type?.entityID ? type.entityID() : null;
+    const store = (this as any)[key];
+    if(typeof store !== undefined) {
+      return store;
+    } else {
+      return null;
+    }
   }
 
   saveToLocalStorage(): void {

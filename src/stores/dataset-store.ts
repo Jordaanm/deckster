@@ -4,11 +4,10 @@ import { observable, decorate } from 'mobx';
 
 export class DataSetStore extends EntityStore<DataSet> {
 
-  public items: DataSet[] = [];
-
-  protected get _items(): DataSet[] {
-    return this.items;
+  public get label(): string {
+    return "Data Sets";
   }
+  
   public get entityName(): string {
     return "datasets";
   }
@@ -30,5 +29,6 @@ export class DataSetStore extends EntityStore<DataSet> {
 }
 
 decorate(DataSetStore, {
-  items: observable
+  items: observable,
+  currentlySelectedID: observable
 });

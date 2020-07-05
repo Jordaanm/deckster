@@ -4,11 +4,10 @@ import { observable, decorate } from 'mobx';
 
 export class DesignStore extends EntityStore<CardDesign> {
 
-  public items: CardDesign[] = [];
-
-  protected get _items(): CardDesign[] {
-    return this.items;
+  public get label(): string {
+    return "Card Designs";
   }
+  
   public get entityName(): string {
     return "designs";
   }
@@ -23,5 +22,6 @@ export class DesignStore extends EntityStore<CardDesign> {
 }
 
 decorate(DesignStore, {
-  items: observable
+  items: observable,
+  currentlySelectedID: observable
 });
