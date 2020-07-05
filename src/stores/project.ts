@@ -10,6 +10,8 @@ export class Project {
   static LOCALSTORAGE_KEY = "project";
   
   name: string = "My Project";
+  currentSection?: string;
+
   datasets: DataSetStore = new DataSetStore();
   designs: DesignStore = new DesignStore();
   transforms: TransformStore = new TransformStore();
@@ -25,6 +27,7 @@ export class Project {
         const deserial = JSON.parse(serialised);
         
         project.name = deserial.name;
+        project.currentSection = deserial.currentSection;
         project.designs.load(deserial.designs);
         project.datasets.load(deserial.datasets);
         project.transforms.load(deserial.transforms);
@@ -49,9 +52,10 @@ export class Project {
   saveToLocalStorage(): void {
     const serialised = JSON.stringify({
       name: toJS(this.name),
+      currentSection: toJS(this.currentSection),
       designs: this.designs.save(),
-      data: this.datasets.save(),
-      transforms: toJS(this.transforms)
+      datasets: this.datasets.save(),
+      transforms: this.transforms.save()
     });
     console.log("Saving to LocalStorage", serialised, this);
     localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);
@@ -75,5 +79,6 @@ export class Project {
 }
 
 decorate(Project, {
-  name: observable
+  name: observable,
+  currentSection: observable
 });

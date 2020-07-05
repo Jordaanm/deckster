@@ -15,7 +15,7 @@ export class DesignStore extends EntityStore<CardDesign> {
   public createFromGuid(guid: string): CardDesign {
     return {
       id: guid,
-      name: '',
+      name: 'New Design',
       code: ''
     };
   }

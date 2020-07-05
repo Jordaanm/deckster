@@ -12,15 +12,15 @@ import "@blueprintjs/table/lib/css/table.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
 
 const AppContainer: React.FC = () => {
-  const {ui, project} = useStores();
+  const { project } = useStores();
   React.useEffect(() => project.autoSave());
 
   return useObserver(() => {
-    const tabChange = (id: string) => ui.currentSection = id;
+    const tabChange = (id: string) => project.currentSection = id;
 
     return (
       <div className="app-container bp3-dark">
-        <Tabs id='AppToolbarTabs' onChange={tabChange} selectedTabId={ui.currentSection} className="full-xy">
+        <Tabs id='AppToolbarTabs' onChange={tabChange} selectedTabId={project.currentSection} className="full-xy">
           <Tab id='design' title='Card Designs' panel={<CardDesigns />} />
           <Tab id='data' title='Data Sets' panel={<DataSets />} />
           <Tab id='transform' title='Transforms' panel={<Transforms />} />

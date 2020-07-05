@@ -11,12 +11,16 @@ export abstract class EntityStore<T extends IEntity> {
   public abstract get label(): string;
   public abstract createFromGuid(guid: string): T;
   
-    public save(): any {
-    const json = toJS(this.items);
+  public save(): any {
+    const json = {
+      current: toJS(this.currentlySelectedID),
+      items: toJS(this.items)
+    };
     return json;
   };
 
   public load(data: any): void {
+    this.currentlySelectedID = data.current;
     this.items.push(...data.items);
   }
 
