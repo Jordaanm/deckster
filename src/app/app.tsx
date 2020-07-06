@@ -3,8 +3,9 @@ import { Tab, Tabs } from '@blueprintjs/core';
 import { useObserver } from 'mobx-react-lite';
 
 import { useStores } from '../stores/util';
-import { CardDesigns } from '../design/design';
 import { DataSets } from '../data-set/data-set';
+import { CardDesigns } from '../design/design';
+import { Images } from '../image/images';
 import { Transforms } from '../transform/transform';
 
 import './app.scss'
@@ -23,6 +24,7 @@ const AppContainer: React.FC = () => {
         <Tabs id='AppToolbarTabs' onChange={tabChange} selectedTabId={project.currentSection} className="full-xy">
           <Tab id='design' title='Card Designs' panel={<CardDesigns />} />
           <Tab id='data' title='Data Sets' panel={<DataSets />} />
+          <Tab id='images' title='Images' panel={<Images />} />
           <Tab id='transform' title='Transforms' panel={<Transforms />} />
         </Tabs>
       </div>

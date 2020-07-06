@@ -22,6 +22,10 @@ export interface Transform extends IEntity {
   steps: TxStep[];
 }
 
+export interface Image extends IEntity {
+  data: string;
+}
+
 export interface SheetData {
   source: string;
   apiKey: string;

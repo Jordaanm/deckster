@@ -6,7 +6,6 @@ import { H1, ControlGroup, Button } from '@blueprintjs/core';
 import { Project } from '../stores/project';
 import { DataSetEditor } from './data-set-editor';
 
-import "./data-set.scss"
 import { entitySelect } from '../app/entity-select';
 
 export const DataSets: React.FC = () => {
