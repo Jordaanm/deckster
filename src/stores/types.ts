@@ -16,6 +16,7 @@ export interface DataSet extends IEntity {
 
 export interface CardDesign extends IEntity {
   code: string;
+  styles: string;
 }
 
 export interface Transform extends IEntity {
@@ -24,6 +25,18 @@ export interface Transform extends IEntity {
 
 export interface Image extends IEntity {
   data: string;
+}
+
+
+export interface GenerateConfig extends IEntity {
+  fieldTransforms: FieldTransformIds[];
+  dataSet: string|null;
+  cardDesign: string|null;
+}
+
+export interface FieldTransformIds {
+  field: string;
+  transform: string;
 }
 
 export interface SheetData {

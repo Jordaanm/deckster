@@ -30,7 +30,6 @@ export const TransformEditor: React.FC<TransformEditorProps> = props => {
     }
 
     const saveStep = (step?: TxStep) => {
-      console.log("Save Step", step);
       if(transform && step) {
         transform.steps.push(step);
       }

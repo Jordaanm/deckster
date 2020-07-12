@@ -6,6 +6,7 @@ import { DataSetStore } from './dataset-store';
 import { TransformStore } from './transform-store';
 import { EntityStore } from './entity-store';
 import { ImageStore } from "./image-store";
+import { GenerateConfigStore } from './generate-config-store';
 
 export class Project {
   static LOCALSTORAGE_KEY = "project";
@@ -17,6 +18,7 @@ export class Project {
   designs: DesignStore = new DesignStore();
   images: ImageStore = new ImageStore();
   transforms: TransformStore = new TransformStore();
+  generateConfigs: GenerateConfigStore = new GenerateConfigStore();
   
   intervalId: number = -1;
 
@@ -34,6 +36,7 @@ export class Project {
         project.designs.load(deserial.designs);
         project.images.load(deserial.images);
         project.transforms.load(deserial.transforms);
+        project.generateConfigs.load(deserial.generateConfigs);
       } catch {
         console.error("Unable to load Project store from local storage");
       }
@@ -59,8 +62,10 @@ export class Project {
       datasets: this.datasets.save(),
       designs: this.designs.save(),
       images: this.images.save(),
-      transforms: this.transforms.save()
+      transforms: this.transforms.save(),
+      generateConfigs: this.generateConfigs.save()
     });
+    
     console.log("Saving to LocalStorage", serialised, this);
     localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);
   }

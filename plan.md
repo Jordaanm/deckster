@@ -30,7 +30,6 @@
   * Back Design
   * Data Set
 
-
 ## Stores
 
 ### Card Designs
@@ -56,9 +55,8 @@
 * Google API Key
 * Current Page/Section
 
-
 # TODO
 
-* Images/Icons
-* Data Transformation
-* Template Rendering
+* Export / Render Section
+* Help Section
+* Settings Section

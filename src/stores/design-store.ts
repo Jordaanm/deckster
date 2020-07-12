@@ -16,7 +16,8 @@ export class DesignStore extends EntityStore<CardDesign> {
     return {
       id: guid,
       name: 'New Design',
-      code: fields?.code || ''
+      code: fields?.code || '',
+      styles: fields?.styles || ''
     };
   }
 }

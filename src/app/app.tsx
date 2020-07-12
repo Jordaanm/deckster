@@ -7,8 +7,10 @@ import { DataSets } from '../data-set/data-set';
 import { CardDesigns } from '../design/design';
 import { Images } from '../image/images';
 import { Transforms } from '../transform/transform';
+import { GenerateConfigPage } from '../generate-config/page';
 
-import './app.scss'
+import './app.scss';
+import './print.scss';
 import "@blueprintjs/table/lib/css/table.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
 
@@ -26,6 +28,7 @@ const AppContainer: React.FC = () => {
           <Tab id='data' title='Data Sets' panel={<DataSets />} />
           <Tab id='images' title='Images' panel={<Images />} />
           <Tab id='transform' title='Transforms' panel={<Transforms />} />
+          <Tab id='generateConfigs' title='Card Sets' panel={<GenerateConfigPage />} />
         </Tabs>
       </div>
     );

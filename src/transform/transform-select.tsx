@@ -23,7 +23,6 @@ export const renderTxOption: ItemRenderer<Transform> = (transform, { handleClick
   };
 
   export const renderTxOperation: ItemRenderer<TxOperation> = (txOp, { handleClick, modifiers, query }) => {
-    console.log("RenderTxOp", txOp);
     if (!modifiers.matchesPredicate) {
         return null;
     }
