@@ -3,3 +3,16 @@
   width: 64mm;
   font-size: 10mm;
 }
+
+@media print {
+  .bp3-drawer-header {
+    display: none!important;
+  } 
+  .bp3-drawer-footer {
+    display: none!important;
+  }
+
+  .bp3-dialog-body {
+    margin: 0!important;
+  }
+}

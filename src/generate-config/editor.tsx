@@ -7,7 +7,6 @@ import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
 import { Select } from '@blueprintjs/select';
-
 interface GenConfigEditorProps {
   config?: GenerateConfig;
 };
@@ -20,6 +19,11 @@ const drawerProps = {
   enforceFocus: true,
   title: "Card Images",
 };
+
+const saveCard = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const html = e.target as HTMLDivElement;
+  console.log("HTML", html.outerHTML);
+}
 
 export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
 
@@ -108,7 +112,7 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
           <div className={Classes.DRAWER_BODY}>
             <div className={Classes.DIALOG_BODY}>
               <style dangerouslySetInnerHTML={{__html: design?.styles||'' }}/>
-              {cardHtml.map((x,i) => <div key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
+              {cardHtml.map((x,i) => <div onClick={saveCard} key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>
