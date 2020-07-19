@@ -20,9 +20,42 @@ const drawerProps = {
   title: "Card Images",
 };
 
-const saveCard = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-  const html = e.target as HTMLDivElement;
-  console.log("HTML", html.outerHTML);
+const buildSVGData = (html: string, css: string): string => {
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" class="playing-card">
+      <foreignObject width="100%" height="100%">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          <style>${css}</style>
+          ${html}
+        </div>
+      </foreignObject>
+    </svg>`
+  );
+};
+
+const saveCard = (html: string, css: string) => {
+  const canvas: HTMLCanvasElement|null = document.getElementById('canvas') as HTMLCanvasElement|null;
+  const DOMURL = window.URL || window.webkitURL || window;
+
+  if(canvas) {
+    var ctx = canvas.getContext('2d');
+    const svgData = buildSVGData(html, css);
+
+    var img = new Image();
+    img.classList.add("playing-card");
+    var svg = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+    var url = DOMURL.createObjectURL(svg);
+    console.log("SVG URL", url);
+
+    img.onload = function () {
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      ctx?.drawImage(img, 0, 0, img.width, img.height);
+      DOMURL.revokeObjectURL(url);
+    }
+    
+    img.src = url;
+  }
 }
 
 export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
@@ -112,7 +145,9 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
           <div className={Classes.DRAWER_BODY}>
             <div className={Classes.DIALOG_BODY}>
               <style dangerouslySetInnerHTML={{__html: design?.styles||'' }}/>
-              {cardHtml.map((x,i) => <div onClick={saveCard} key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
+              {cardHtml.map((x,i) => <div onClick={() => saveCard(x, design?.styles||'')} key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
+              <canvas id="canvas" className="playing-card"></canvas>
+              <div dangerouslySetInnerHTML={{ __html: buildSVGData(cardHtml[0], design?.styles||'')}} />
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>
