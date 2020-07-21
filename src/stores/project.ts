@@ -22,28 +22,47 @@ export class Project {
   
   intervalId: number = -1;
 
-  static loadFromLocalStorage(): Project {
+  static loadFromJson(deserial: any): Project {
     const project = new Project();
+    console.log("LOADING JSON", deserial);
 
-    const serialised = localStorage?.getItem(Project.LOCALSTORAGE_KEY);
-    if(serialised) {
-      try {
-        const deserial = JSON.parse(serialised);
-        
-        project.name = deserial.name;
-        project.currentSection = deserial.currentSection;
-        project.datasets.load(deserial.datasets);
-        project.designs.load(deserial.designs);
-        project.images.load(deserial.images);
-        project.transforms.load(deserial.transforms);
-        project.generateConfigs.load(deserial.generateConfigs);
-      } catch {
-        console.error("Unable to load Project store from local storage");
-      }
+    try {
+      project.name = deserial.name;
+      project.currentSection = deserial.currentSection;
+      project.datasets.load(deserial.datasets);
+      project.designs.load(deserial.designs);
+      project.images.load(deserial.images);
+      project.transforms.load(deserial.transforms);
+      project.generateConfigs.load(deserial.generateConfigs);
+    } catch(e) {
+      console.error("Unable to load project from JSON", e);
     }
 
     return project;
   }
+
+  static loadFromLocalStorage(): Project {
+    const serialised = localStorage?.getItem(Project.LOCALSTORAGE_KEY);
+    if(serialised !== null) {
+      try {
+        const deserial = JSON.parse(serialised);
+        return Project.loadFromJson(deserial);
+      } catch {
+        console.error("Unable to load Project store from local storage");
+      }
+    }
+    return new Project();
+  }
+
+  public loadFromProject(project: Project) {
+    this.name = project.name;
+    this.currentSection = project.currentSection;
+    this.datasets = project.datasets;
+    this.designs = project.designs;
+    this.images = project.images;
+    this.transforms = project.transforms;
+    this.generateConfigs = project.generateConfigs;
+  };
 
   getStore<T extends IEntity>(type: any): EntityStore<T>|null {
     const key = type?.entityID ? type.entityID() : null;
@@ -54,8 +73,8 @@ export class Project {
       return null;
     }
   }
-
-  saveToLocalStorage(): void {
+  
+  serialise(): string {
     const serialised = JSON.stringify({
       name: toJS(this.name),
       currentSection: toJS(this.currentSection),
@@ -65,6 +84,12 @@ export class Project {
       transforms: this.transforms.save(),
       generateConfigs: this.generateConfigs.save()
     });
+
+    return serialised;
+  }
+
+  saveToLocalStorage(): void {
+    const serialised = this.serialise();
     
     console.log("Saving to LocalStorage", serialised, this);
     localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);

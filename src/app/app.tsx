@@ -13,6 +13,7 @@ import './app.scss';
 import './print.scss';
 import "@blueprintjs/table/lib/css/table.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
+import { ProjectPage } from '../project/page';
 
 const AppContainer: React.FC = () => {
   const { project } = useStores();
@@ -24,6 +25,7 @@ const AppContainer: React.FC = () => {
     return (
       <div className="app-container bp3-dark">
         <Tabs id='AppToolbarTabs' onChange={tabChange} selectedTabId={project.currentSection} className="full-xy">
+          <Tab id='project' title='Project' panel={<ProjectPage />} />
           <Tab id='design' title='Card Designs' panel={<CardDesigns />} />
           <Tab id='data' title='Data Sets' panel={<DataSets />} />
           <Tab id='images' title='Images' panel={<Images />} />
