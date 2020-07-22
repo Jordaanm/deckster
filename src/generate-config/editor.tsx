@@ -11,6 +11,14 @@ interface GenConfigEditorProps {
   config?: GenerateConfig;
 };
 
+const PLAYING_CARD_CSS = `
+  .playing-card {
+    height: 89mm;
+    width: 64mm;
+    font-size: 10mm;
+  }
+`;
+
 const drawerProps = {
   size: "100%",
   autoFocus: true,
@@ -22,10 +30,11 @@ const drawerProps = {
 
 const buildSVGData = (html: string, css: string): string => {
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" class="playing-card">
-      <foreignObject width="100%" height="100%">
-        <div xmlns="http://www.w3.org/1999/xhtml">
+    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="640" height="890" viewbox="0 0 320 445">
+      <foreignObject x="0" y="0" width="640" height="890">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%;">
           <style>${css}</style>
+          <style>${PLAYING_CARD_CSS}</style>
           ${html}
         </div>
       </foreignObject>
@@ -33,30 +42,51 @@ const buildSVGData = (html: string, css: string): string => {
   );
 };
 
+const triggerDownload = (imgURI: string) => {
+  var evt = new MouseEvent('click', {
+    view: window,
+    bubbles: false,
+    cancelable: true
+  });
+
+  var a = document.createElement('a');
+  a.setAttribute('download', 'card.png');
+  a.setAttribute('href', imgURI);
+  a.setAttribute('target', '_blank');
+
+  a.dispatchEvent(evt);
+}
+
 const saveCard = (html: string, css: string) => {
   const canvas: HTMLCanvasElement|null = document.getElementById('canvas') as HTMLCanvasElement|null;
-  const DOMURL = window.URL || window.webkitURL || window;
-
+  
   if(canvas) {
     var ctx = canvas.getContext('2d');
     const svgData = buildSVGData(html, css);
 
     var img = new Image();
-    img.classList.add("playing-card");
-    var svg = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-    var url = DOMURL.createObjectURL(svg);
-    console.log("SVG URL", url);
+    var blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+    var fileReader = new FileReader();
 
-    img.onload = function () {
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      ctx?.drawImage(img, 0, 0, img.width, img.height);
-      DOMURL.revokeObjectURL(url);
+    fileReader.onload = (e: any) => {
+      var url = e.target.result;
+  
+      img.onload = function () {
+        ctx?.drawImage(img, 0, 0);
+        document.body.appendChild(img);
+  
+        var imgURI = canvas
+        .toDataURL('image/png')
+        .replace('image/png', 'image/octet-stream');
+  
+        triggerDownload(imgURI);
+      }
+      
+      img.src = url;  
     }
-    
-    img.src = url;
+    fileReader.readAsDataURL(blob);
   }
-}
+};
 
 export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
 
@@ -145,9 +175,12 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
           <div className={Classes.DRAWER_BODY}>
             <div className={Classes.DIALOG_BODY}>
               <style dangerouslySetInnerHTML={{__html: design?.styles||'' }}/>
+              <style dangerouslySetInnerHTML={{__html: PLAYING_CARD_CSS}} />
               {cardHtml.map((x,i) => <div onClick={() => saveCard(x, design?.styles||'')} key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
-              <canvas id="canvas" className="playing-card"></canvas>
-              <div dangerouslySetInnerHTML={{ __html: buildSVGData(cardHtml[0], design?.styles||'')}} />
+              <div className="playing-card">
+                <canvas id="canvas" style={{width: "100%", height: "100%"}}></canvas>
+              </div>
+              <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardHtml[0], design?.styles||'')}} />
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>
