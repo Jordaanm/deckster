@@ -6,18 +6,13 @@ import { IStores } from '../stores/index';
 import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
+import { svgBlobForCard, dataUrlFromImageBlob, triggerDownload, PLAYING_CARD_CSS, buildSVGData, pngBlobFromSvgBlob } from '../utils/card-utils';
 import { Select } from '@blueprintjs/select';
+import { downloadZip, InputWithMeta, InputWithoutMeta } from 'client-zip';
+
 interface GenConfigEditorProps {
   config?: GenerateConfig;
 };
-
-const PLAYING_CARD_CSS = `
-  .playing-card {
-    height: 89mm;
-    width: 64mm;
-    font-size: 10mm;
-  }
-`;
 
 const drawerProps = {
   size: "100%",
@@ -28,65 +23,34 @@ const drawerProps = {
   title: "Card Images",
 };
 
-const buildSVGData = (html: string, css: string): string => {
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="640" height="890" viewbox="0 0 320 445">
-      <foreignObject x="0" y="0" width="640" height="890">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%;">
-          <style>${css}</style>
-          <style>${PLAYING_CARD_CSS}</style>
-          ${html}
-        </div>
-      </foreignObject>
-    </svg>`
-  );
-};
-
-const triggerDownload = (imgURI: string) => {
-  var evt = new MouseEvent('click', {
-    view: window,
-    bubbles: false,
-    cancelable: true
-  });
-
-  var a = document.createElement('a');
-  a.setAttribute('download', 'card.png');
-  a.setAttribute('href', imgURI);
-  a.setAttribute('target', '_blank');
-
-  a.dispatchEvent(evt);
-}
-
 const saveCard = (html: string, css: string) => {
-  const canvas: HTMLCanvasElement|null = document.getElementById('canvas') as HTMLCanvasElement|null;
-  
-  if(canvas) {
-    var ctx = canvas.getContext('2d');
-    const svgData = buildSVGData(html, css);
-
-    var img = new Image();
-    var blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-    var fileReader = new FileReader();
-
-    fileReader.onload = (e: any) => {
-      var url = e.target.result;
-  
-      img.onload = function () {
-        ctx?.drawImage(img, 0, 0);
-        document.body.appendChild(img);
-  
-        var imgURI = canvas
-        .toDataURL('image/png')
-        .replace('image/png', 'image/octet-stream');
-  
-        triggerDownload(imgURI);
-      }
-      
-      img.src = url;  
-    }
-    fileReader.readAsDataURL(blob);
-  }
+  var blob = svgBlobForCard(html, css);
+  dataUrlFromImageBlob(uri => triggerDownload(uri))(blob);
 };
+const saveZip = async (htmlList: string[], css: string) => {
+  const pngBlobPromises = htmlList
+    .map(html => svgBlobForCard(html, css))
+    .map(pngBlobFromSvgBlob);
+
+  const results = await Promise.all(pngBlobPromises)
+  const contents = results
+    .map((blob: Blob|null, index: number) => {
+    if(blob!= null) {
+      return {
+        name: `card${index}.png`,
+        input: blob as Blob
+      };
+    } else {
+      return null;
+    }
+  }).filter(x => x !== null);
+
+  const blob = await downloadZip([...contents]).blob();
+  const url = URL.createObjectURL(blob);
+
+  triggerDownload(url, 'deck.zip');
+  URL.revokeObjectURL(url);
+}
 
 export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
 
@@ -139,13 +103,19 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
         return $el.outerHTML;
       });
 
-      setCardHtml(renderedCardData);
+      return renderedCardData;
     };
 
     const openDrawer = () => {
-      generateCardData();
+      const cardData = generateCardData();
+      setCardHtml(cardData);
       toggleDrawer();
     };
+
+    const generateZip = () => {
+      const cardData = generateCardData();
+      saveZip(cardData, design?.styles||'');
+    }
 
     return (
       <section className="row editor">
@@ -154,6 +124,7 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
             <H2><EditableText onChange={changeName} value={config.name} /></H2>
             <ButtonGroup>
               <Button icon="delete" text="Remove this Card Set" onClick={remove} />
+              <Button icon="download" text="Download as Zip" onClick={generateZip} />
             </ButtonGroup>
           </div>
           <div className="row">      
@@ -177,9 +148,6 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
               <style dangerouslySetInnerHTML={{__html: design?.styles||'' }}/>
               <style dangerouslySetInnerHTML={{__html: PLAYING_CARD_CSS}} />
               {cardHtml.map((x,i) => <div onClick={() => saveCard(x, design?.styles||'')} key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
-              <div className="playing-card">
-                <canvas id="canvas" style={{width: "100%", height: "100%"}}></canvas>
-              </div>
               <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardHtml[0], design?.styles||'')}} />
             </div>
           </div>
