@@ -28,7 +28,7 @@ export interface Image extends IEntity {
 }
 
 
-export interface GenerateConfig extends IEntity {
+export interface Render extends IEntity {
   fieldTransforms: FieldTransformIds[];
   dataSet: string|null;
   cardDesign: string|null;

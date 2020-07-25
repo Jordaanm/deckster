@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { useObserver } from 'mobx-react-lite';
 import { H2, EditableText, Button, ButtonGroup, MenuItem, Drawer, Classes } from '@blueprintjs/core';
-import { GenerateConfig, CardDesign, DataSet, IEntity } from '../stores/types';
+import { Render, CardDesign, DataSet, IEntity } from '../stores/types';
 import { IStores } from '../stores/index';
 import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
 import { svgBlobForCard, dataUrlFromImageBlob, triggerDownload, PLAYING_CARD_CSS, buildSVGData, pngBlobFromSvgBlob } from '../utils/card-utils';
 import { Select } from '@blueprintjs/select';
-import { downloadZip, InputWithMeta, InputWithoutMeta } from 'client-zip';
+import { downloadZip } from 'client-zip';
 
-interface GenConfigEditorProps {
-  config?: GenerateConfig;
+interface RenderEditorProps {
+  config?: Render;
 };
 
 const drawerProps = {
@@ -52,7 +52,7 @@ const saveZip = async (htmlList: string[], css: string) => {
   URL.revokeObjectURL(url);
 }
 
-export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
+export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
 
   const stores: IStores = useStores();
   const { project } = stores;
@@ -70,7 +70,7 @@ export const GenConfigEditor: React.FC<GenConfigEditorProps> = (props) => {
     const changeName = (text: string) => { if(config) { config.name = text; }};
     const setDesign = (design: IEntity) => { config.cardDesign = design.id; }
     const setDataSet = (dataSet: IEntity) => { config.dataSet = dataSet.id; }
-    const remove = () => project.generateConfigs.remove(config.id);
+    const remove = () => project.renders.remove(config.id);
 
     const dataSet: DataSet|undefined = project.datasets.find(config.dataSet || undefined);
     const design: CardDesign|undefined = project.designs.find(config.cardDesign || undefined);

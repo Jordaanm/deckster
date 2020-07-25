@@ -4,7 +4,7 @@ import { useStores } from '../stores/util';
 import { IStores } from '../stores/index';
 import { H1, ControlGroup, Button } from '@blueprintjs/core';
 import { Project } from '../stores/project';
-import { GenConfigEditor } from './editor';
+import { RenderEditor } from './editor';
 
 import { entitySelect } from '../app/entity-select';
 
@@ -14,11 +14,11 @@ export const GenerateConfigPage: React.FC = () => {
   const project: Project = stores.project;
     
   const addNewCardSet = () => {
-    project.generateConfigs.addNew(true);
+    project.renders.addNew(true);
   };
 
   return useObserver(() => {
-    const store = project.generateConfigs;
+    const store = project.renders;
     const current = store.currentItem;
     
     return (
@@ -27,11 +27,11 @@ export const GenerateConfigPage: React.FC = () => {
         <div className="col">
           <div className="row">
             <ControlGroup fill={true}>
-              {entitySelect(project.generateConfigs)}
+              {entitySelect(project.renders)}
               <Button icon="add" text="Add New Card Set" onClick={addNewCardSet}/>
             </ControlGroup>
           </div>
-          <GenConfigEditor config={current} />
+          <RenderEditor config={current} />
         </div>
       </section>
     );
