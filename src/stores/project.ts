@@ -13,6 +13,7 @@ export class Project {
   
   name: string = "My Project";
   currentSection?: string;
+  enableAutosave: boolean = false;
 
   datasets: DataSetStore = new DataSetStore();
   designs: DesignStore = new DesignStore();
@@ -29,6 +30,8 @@ export class Project {
     try {
       project.name = deserial.name;
       project.currentSection = deserial.currentSection;
+      project.enableAutosave = deserial.enableAutosave;
+
       project.datasets.load(deserial.datasets);
       project.designs.load(deserial.designs);
       project.images.load(deserial.images);
@@ -57,6 +60,8 @@ export class Project {
   public loadFromProject(project: Project) {
     this.name = project.name;
     this.currentSection = project.currentSection;
+    this.enableAutosave = project.enableAutosave;
+
     this.datasets = project.datasets;
     this.designs = project.designs;
     this.images = project.images;
@@ -78,6 +83,8 @@ export class Project {
     const serialised = JSON.stringify({
       name: toJS(this.name),
       currentSection: toJS(this.currentSection),
+      enableAutosave: toJS(this.enableAutosave),
+
       datasets: this.datasets.save(),
       designs: this.designs.save(),
       images: this.images.save(),
@@ -95,10 +102,15 @@ export class Project {
     localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);
   }
 
+  runAutosave() {
+    if(this.enableAutosave) {
+      this.saveToLocalStorage();
+    }
+  }
+
   autoSave(period: number = 15000): void {
     if(this.intervalId !== -1) { clearInterval(this.intervalId); }
-    this.saveToLocalStorage();
-    this.intervalId = window.setInterval(() => this.saveToLocalStorage(), period);
+    this.intervalId = window.setInterval(() => this.runAutosave(), period);
   } 
 
   createStep(fields: { params: string[]; operation: TxOperation; }): TxStep {
@@ -114,5 +126,6 @@ export class Project {
 
 decorate(Project, {
   name: observable,
-  currentSection: observable
+  currentSection: observable,
+  enableAutosave: observable
 });

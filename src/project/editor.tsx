@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Project } from '../stores/project';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button } from '@blueprintjs/core';
+import { H2, EditableText, Button, FormGroup, Switch } from '@blueprintjs/core';
 import FileSaver from 'file-saver';
 import { fileLoader } from '../stores/util';
 
@@ -13,6 +13,8 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = (props) => {
   const [$fileInput, setFileInput] = React.useState<HTMLInputElement|null>();
 
   const {project} = props;
+  const toggleAutosave = () => { project.enableAutosave = !project.enableAutosave; };
+
   return useObserver(() => {
 
     const loadFile = fileLoader((result: string|ArrayBuffer|null) => {
@@ -54,7 +56,12 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = (props) => {
               />             
             <Button icon="export" text="Export Save File" onClick={saveToFile}/>  
             <Button icon="import" text="Import Save File" onClick={importFile}/>  
-          </div>          
+          </div>
+          <div className="row">
+            <FormGroup label="Autosave Settings">
+              <Switch label="Enable Autosave" checked={project.enableAutosave} onChange={toggleAutosave} />
+            </FormGroup>
+          </div>       
         </div>
       </section>
     );
