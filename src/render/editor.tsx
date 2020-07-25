@@ -10,6 +10,8 @@ import { svgBlobForCard, dataUrlFromImageBlob, triggerDownload, PLAYING_CARD_CSS
 import { Select } from '@blueprintjs/select';
 import { downloadZip } from 'client-zip';
 
+import './render.scss'
+
 interface RenderEditorProps {
   config?: Render;
 };
@@ -147,7 +149,19 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
             <div className={Classes.DIALOG_BODY}>
               <style dangerouslySetInnerHTML={{__html: design?.styles||'' }}/>
               <style dangerouslySetInnerHTML={{__html: PLAYING_CARD_CSS}} />
-              {cardHtml.map((x,i) => <div onClick={() => saveCard(x, design?.styles||'')} key={i} dangerouslySetInnerHTML={{__html: x}}/>)}
+              <div className="card-list row wrap">
+                {cardHtml.map((x,i) => 
+                  <div key={i} className="hover-actions-container">
+                    <div className="hover-actions">
+                      <Button icon="download" onClick={() => saveCard(x, design?.styles||'')} >
+                        Download
+                      </Button>
+                    </div>
+                    <div style={{display: 'inline'}} dangerouslySetInnerHTML={{__html: x}}/>
+                  </div>
+                )}
+              </div>
+              {/* TESTING SVG RENDERING */}
               <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardHtml[0], design?.styles||'')}} />
             </div>
           </div>

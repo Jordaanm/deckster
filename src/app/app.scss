@@ -21,3 +21,24 @@
   width: 1200px;
   margin: 0 auto;
 }
+
+.hover-actions-container {
+  position: relative;
+  display: inline-block;
+  &:not(:hover) .hover-actions {
+    display: none;
+  }
+}
+
+
+.hover-actions {
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+  right: 0.5em;
+  bottom: 0.5em;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
