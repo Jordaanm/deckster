@@ -4,7 +4,7 @@ import { Project } from '../stores/project';
 import { MenuItem, Button, Popover, Menu, Position, H1, ControlGroup } from '@blueprintjs/core';
 import { IStores } from '../stores/index';
 import { useObserver } from 'mobx-react-lite';
-import { DesignEditor } from './design-editor';
+import { DesignEditor } from './editor';
 
 import './design.scss';
 import { entitySelect } from '../app/entity-select';

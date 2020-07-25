@@ -3,7 +3,6 @@ import { Select, ItemRenderer} from '@blueprintjs/select';
 import { Transform, TxOperation } from '../stores/types';
 import { MenuItem } from '@blueprintjs/core';
 
-export const TransformSelect = Select.ofType<Transform>();
 export const OperationSelect = Select.ofType<TxOperation>();
 
 export const renderTxOption: ItemRenderer<Transform> = (transform, { handleClick, modifiers, query }) => {

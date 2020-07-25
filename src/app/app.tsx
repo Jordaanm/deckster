@@ -3,11 +3,11 @@ import { Tab, Tabs } from '@blueprintjs/core';
 import { useObserver } from 'mobx-react-lite';
 
 import { useStores } from '../stores/util';
-import { DataSets } from '../data-set/data-set';
-import { CardDesigns } from '../design/design';
-import { Images } from '../image/images';
-import { Transforms } from '../transform/transform';
-import { GenerateConfigPage } from '../generate-config/page';
+import { DataSets } from '../data-set/page';
+import { CardDesigns } from '../design/page';
+import { Images } from '../image/page';
+import { Transforms } from '../transform/page';
+import { GenerateConfigPage } from '../render/page';
 
 import './app.scss';
 import './print.scss';

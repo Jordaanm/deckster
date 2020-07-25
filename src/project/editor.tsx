@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Project } from '../stores/project';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button, FormGroup, Switch, NumericInput, Label, ButtonGroup, Intent, Slider } from '@blueprintjs/core';
+import { H2, EditableText, Button, FormGroup, Switch, Label, ButtonGroup, Intent, Slider } from '@blueprintjs/core';
 import FileSaver from 'file-saver';
 import { fileLoader } from '../stores/util';
 

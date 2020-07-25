@@ -5,7 +5,7 @@ import { useStores } from '../stores/util';
 import { Project } from '../stores/project';
 import { IStores } from '../stores/index';
 import { renderTxOption } from './transform-select';
-import { TransformEditor } from './transform-editor';
+import { TransformEditor } from './editor';
 import { Transform } from '../stores/types';
 
 // import './transform.scss';

@@ -4,7 +4,7 @@ import { useStores } from '../stores/util';
 import { IStores } from '../stores/index';
 import { H1, ControlGroup, Button } from '@blueprintjs/core';
 import { Project } from '../stores/project';
-import { DataSetEditor } from './data-set-editor';
+import { DataSetEditor } from './editor';
 
 import { entitySelect } from '../app/entity-select';
 
