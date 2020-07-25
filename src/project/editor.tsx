@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Project } from '../stores/project';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button, FormGroup, Switch } from '@blueprintjs/core';
+import { H2, EditableText, Button, FormGroup, Switch, NumericInput, Label, ButtonGroup, Intent, Slider } from '@blueprintjs/core';
 import FileSaver from 'file-saver';
 import { fileLoader } from '../stores/util';
 
@@ -44,22 +44,32 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = (props) => {
       <section className="row editor">
         <div className="f1 col">
           <div className="row">
-            <H2><EditableText onChange={changeName} value={project.name} /></H2>
+            <Label>
+              Project Name
+              <H2><EditableText onChange={changeName} value={project.name} /></H2>
+            </Label>
           </div>
           <div className="row">
-              <input
-                type="file"
-                accept=".json"
-                ref={x => setFileInput(x)}
-                onChange={loadFile}
-                className="hidden"
-              />             
-            <Button icon="export" text="Export Save File" onClick={saveToFile}/>  
-            <Button icon="import" text="Import Save File" onClick={importFile}/>  
+            <input
+              type="file"
+              accept=".json"
+              ref={x => setFileInput(x)}
+              onChange={loadFile}
+              className="hidden"
+            />
+            <ButtonGroup large={true}>
+              <Button icon="export" text="Export Save File" onClick={saveToFile} intent={Intent.PRIMARY} />  
+              <Button icon="import" text="Import Save File" onClick={importFile} intent={Intent.PRIMARY} />  
+            </ButtonGroup>
           </div>
           <div className="row">
-            <FormGroup label="Autosave Settings">
+            <FormGroup label="Autosave Settings" intent={Intent.PRIMARY} className="full-x">
               <Switch label="Enable Autosave" checked={project.enableAutosave} onChange={toggleAutosave} />
+              <Label>
+                Autosave Period
+                <Slider value={project.autosavePeriod} min={15} max={360} onChange={val => project.updateAutosavePeriod(val)} intent={Intent.PRIMARY} labelStepSize={30} />
+                {/* <NumericInput value={(project.autosavePeriod || 0).toString()} onValueChange={val => project.updateAutosavePeriod(val)} leftIcon="stopwatch" large={true} /> */}
+              </Label>
             </FormGroup>
           </div>       
         </div>

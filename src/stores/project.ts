@@ -14,6 +14,7 @@ export class Project {
   name: string = "My Project";
   currentSection?: string;
   enableAutosave: boolean = false;
+  autosavePeriod: number = 15;
 
   datasets: DataSetStore = new DataSetStore();
   designs: DesignStore = new DesignStore();
@@ -31,6 +32,7 @@ export class Project {
       project.name = deserial.name;
       project.currentSection = deserial.currentSection;
       project.enableAutosave = deserial.enableAutosave;
+      project.autosavePeriod = deserial.autosavePeriod;
 
       project.datasets.load(deserial.datasets);
       project.designs.load(deserial.designs);
@@ -61,6 +63,7 @@ export class Project {
     this.name = project.name;
     this.currentSection = project.currentSection;
     this.enableAutosave = project.enableAutosave;
+    this.autosavePeriod = project.autosavePeriod;
 
     this.datasets = project.datasets;
     this.designs = project.designs;
@@ -84,6 +87,7 @@ export class Project {
       name: toJS(this.name),
       currentSection: toJS(this.currentSection),
       enableAutosave: toJS(this.enableAutosave),
+      autosavePeriod: toJS(this.autosavePeriod),
 
       datasets: this.datasets.save(),
       designs: this.designs.save(),
@@ -102,13 +106,33 @@ export class Project {
     localStorage?.setItem(Project.LOCALSTORAGE_KEY, serialised);
   }
 
-  runAutosave() {
+  private runAutosave() {
     if(this.enableAutosave) {
       this.saveToLocalStorage();
     }
   }
 
-  autoSave(period: number = 15000): void {
+  private getPeriodBase(): number {
+    let periodBase = this.autosavePeriod;
+    if(typeof periodBase !== 'number' || periodBase < 15) {
+      periodBase = 15;
+    }
+
+    return periodBase;
+  }
+
+  updateAutosavePeriod(period: number|string) {
+    const periodNumber = Number(period);
+    if(periodNumber >= 15) {
+      this.autosavePeriod = periodNumber;
+      this.autoSave();
+    }
+  }
+
+  autoSave(): void {
+    const periodBase = this.getPeriodBase();
+    const period = periodBase * 1000;
+
     if(this.intervalId !== -1) { clearInterval(this.intervalId); }
     this.intervalId = window.setInterval(() => this.runAutosave(), period);
   } 
@@ -127,5 +151,6 @@ export class Project {
 decorate(Project, {
   name: observable,
   currentSection: observable,
-  enableAutosave: observable
+  enableAutosave: observable,
+  autosavePeriod: observable
 });

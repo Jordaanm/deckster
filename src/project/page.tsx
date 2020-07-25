@@ -7,6 +7,8 @@ import { Project } from '../stores/project';
 import { useStores } from '../stores/util';
 import { ProjectEditor } from './editor';
 
+import "./project.scss";
+
 export const ProjectPage: React.FC = () => {
   
   const stores: IStores = useStores();
@@ -15,7 +17,7 @@ export const ProjectPage: React.FC = () => {
 
   return useObserver(() => {
     return (
-      <section className="app-section card-designs">
+      <section className="app-section project">
         <H1>Project</H1>
         <Helmet>
           <title>{project?.name||''} - Card Generator</title>
