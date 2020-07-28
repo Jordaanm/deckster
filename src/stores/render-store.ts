@@ -18,7 +18,8 @@ export class RenderStore extends EntityStore<Render> {
       name: 'New Set of Cards',
       fieldTransforms: [],
       dataSet: null,
-      cardDesign: null
+      cardDesign: null,
+      cardBackDesign: null
     };
   }
 }

@@ -32,6 +32,7 @@ export interface Render extends IEntity {
   fieldTransforms: FieldTransformIds[];
   dataSet: string|null;
   cardDesign: string|null;
+  cardBackDesign: string|null;
 }
 
 export interface FieldTransformIds {

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button, ButtonGroup, MenuItem, Drawer, Classes } from '@blueprintjs/core';
+import { H2, EditableText, Button, ButtonGroup, MenuItem, Drawer, Classes, Label, HTMLSelect } from '@blueprintjs/core';
 import { Render, CardDesign, DataSet, IEntity } from '../stores/types';
 import { IStores } from '../stores/index';
 import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
-import { svgBlobForCard, dataUrlFromImageBlob, triggerDownload, PLAYING_CARD_CSS, buildSVGData, pngBlobFromSvgBlob } from '../utils/card-utils';
+import { svgBlobForCard, dataUrlFromImageBlob, triggerDownload, PLAYING_CARD_CSS, buildSVGData, pngBlobFromSvgBlob, generateCardData, CardBackSettings, RenderInfo, generateRenderInfo } from '../utils/card-utils';
 import { Select } from '@blueprintjs/select';
 import { downloadZip } from 'client-zip';
 
@@ -29,6 +29,7 @@ const saveCard = (html: string, css: string) => {
   var blob = svgBlobForCard(html, css);
   dataUrlFromImageBlob(uri => triggerDownload(uri))(blob);
 };
+
 const saveZip = async (htmlList: string[], css: string) => {
   const pngBlobPromises = htmlList
     .map(html => svgBlobForCard(html, css))
@@ -59,7 +60,9 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
   const stores: IStores = useStores();
   const { project } = stores;
   const [showDrawer, setShowDrawer] = React.useState<Boolean>(false);
-  const [cardHtml, setCardHtml] = React.useState<string[]>([]);
+
+  const [cardBackSettings, setCardBackSettings] = React.useState<string>(CardBackSettings.COLLATE);
+  const [cardRenderInfo, setCardRenderInfo] = React.useState<RenderInfo[]>([]);
 
   return useObserver(() => {
     const { config } = props;
@@ -71,51 +74,22 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
 
     const changeName = (text: string) => { if(config) { config.name = text; }};
     const setDesign = (design: IEntity) => { config.cardDesign = design.id; }
+    const setBackDesign = (design: IEntity) => { config.cardBackDesign = design.id; }
     const setDataSet = (dataSet: IEntity) => { config.dataSet = dataSet.id; }
     const remove = () => project.renders.remove(config.id);
 
     const dataSet: DataSet|undefined = project.datasets.find(config.dataSet || undefined);
     const design: CardDesign|undefined = project.designs.find(config.cardDesign || undefined);
-
-    const generateCardData = () => {
-
-      //For each row of the data set
-      const cardData = (dataSet?.data || []).map(datum => {
-        const newDatum = {...datum };
-        //Transform data by fieldMappings
-
-        //Return transformed data;
-        return newDatum;
-      });
-
-      const renderedCardData = cardData.map(cdatum => {
-        //Render into template
-        const $el = document.createElement("div");
-        $el.classList.add("playing-card");
-        $el.innerHTML = design?.code || '';
-        $el.querySelectorAll('[data-fieldid]').forEach(node => {
-          const key = node.getAttribute("data-fieldid");
-          console.log("Found a field", node, key, cdatum[key||'']);
-          if(key != null) {
-            const value = cdatum[key];
-            node.innerHTML = value;
-          }
-        });
-
-        return $el.outerHTML;
-      });
-
-      return renderedCardData;
-    };
+    const backDesign: CardDesign|undefined = project.designs.find(config.cardBackDesign || undefined);
 
     const openDrawer = () => {
-      const cardData = generateCardData();
-      setCardHtml(cardData);
+      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings);
+      setCardRenderInfo(renderInfo);
       toggleDrawer();
     };
 
     const generateZip = () => {
-      const cardData = generateCardData();
+      const cardData = generateCardData(design, dataSet?.data);
       saveZip(cardData, design?.styles||'');
     }
 
@@ -129,11 +103,34 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
               <Button icon="download" text="Download as Zip" onClick={generateZip} />
             </ButtonGroup>
           </div>
-          <div className="row">      
-            {configEntitySelect<CardDesign>(project.designs, setDesign, design)}
+          <div className="row">
+            <Label>
+              Card Face Design
+              {configEntitySelect<CardDesign>(project.designs, setDesign, design)}
+            </Label>      
           </div>
-          <div className="row">         
-            {configEntitySelect(project.datasets, setDataSet, dataSet)}
+          <div className="row">
+            <Label>
+              Card Back Design
+              {configEntitySelect<CardDesign>(project.designs, setBackDesign, backDesign)}
+            </Label>      
+          </div>
+          <div className="row">
+            <Label>
+              Data Set
+              {configEntitySelect(project.datasets, setDataSet, dataSet)}
+            </Label>         
+          </div>
+          <div className="row">
+            <Label>
+              Card Back Placement
+              <HTMLSelect value={cardBackSettings} onChange={e => setCardBackSettings(e.target.value)}>
+                <option value={CardBackSettings.NONE}>Don't Render Backs</option>
+                <option value={CardBackSettings.FIRST}>Only Render The First Back</option>
+                <option value={CardBackSettings.AFTER}>Render Backs after Faces</option>
+                <option value={CardBackSettings.COLLATE}>Collate Card Faces and Backs</option>
+              </HTMLSelect>
+            </Label>
           </div>
           <div className="row">
             <Button onClick={openDrawer}>Generate Cards</Button>
@@ -148,21 +145,25 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
           <div className={Classes.DRAWER_BODY}>
             <div className={Classes.DIALOG_BODY}>
               <style dangerouslySetInnerHTML={{__html: design?.styles||'' }}/>
+              <style dangerouslySetInnerHTML={{__html: backDesign?.styles||'' }}/>
               <style dangerouslySetInnerHTML={{__html: PLAYING_CARD_CSS}} />
               <div className="card-list row wrap">
-                {cardHtml.map((x,i) => 
-                  <div key={i} className="hover-actions-container">
+                {cardRenderInfo.map((x: RenderInfo, i: number) => (
+                  <div className="hover-actions-container">
                     <div className="hover-actions">
-                      <Button icon="download" onClick={() => saveCard(x, design?.styles||'')} >
+                      <Button icon="download" onClick={() => saveCard(x.html, x.css)} >
                         Download
                       </Button>
                     </div>
-                    <div style={{display: 'inline'}} dangerouslySetInnerHTML={{__html: x}}/>
-                  </div>
-                )}
-              </div>
+                    <div style={{display: 'inline'}} dangerouslySetInnerHTML={{__html: x.html}}/>
+                  </div>                    
+                ))}
+              </div>              
               {/* TESTING SVG RENDERING */}
-              <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardHtml[0], design?.styles||'')}} />
+              {
+                cardRenderInfo.length > 0 &&
+                <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardRenderInfo[0].html, design?.styles||'')}} />
+              }
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>
