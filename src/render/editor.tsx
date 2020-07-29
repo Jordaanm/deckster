@@ -6,7 +6,7 @@ import { IStores } from '../stores/index';
 import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
-import { svgBlobForCard, dataUrlFromImageBlob, triggerDownload, PLAYING_CARD_CSS, buildSVGData, pngBlobFromSvgBlob, generateCardData, CardBackSettings, RenderInfo, generateRenderInfo } from '../utils/card-utils';
+import { svgBlobForCard, triggerDownload, PLAYING_CARD_CSS, pngBlobFromSvgBlob, generateCardData, CardBackSettings, RenderInfo, generateRenderInfo, renderBlobToCanvas } from '../utils/card-utils';
 import { Select } from '@blueprintjs/select';
 import { downloadZip } from 'client-zip';
 
@@ -27,7 +27,13 @@ const drawerProps = {
 
 const saveCard = (html: string, css: string) => {
   var blob = svgBlobForCard(html, css);
-  dataUrlFromImageBlob(uri => triggerDownload(uri))(blob);
+  renderBlobToCanvas(blob, canvas => {    
+    const imgURI = canvas
+    .toDataURL('image/png')
+    .replace('image/png', 'image/octet-stream');
+
+    triggerDownload(imgURI);
+  });
 };
 
 const saveZip = async (htmlList: string[], css: string) => {
@@ -149,7 +155,7 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
               <style dangerouslySetInnerHTML={{__html: PLAYING_CARD_CSS}} />
               <div className="card-list row wrap">
                 {cardRenderInfo.map((x: RenderInfo, i: number) => (
-                  <div className="hover-actions-container">
+                  <div className="hover-actions-container" key={i}>
                     <div className="hover-actions">
                       <Button icon="download" onClick={() => saveCard(x.html, x.css)} >
                         Download
@@ -160,10 +166,10 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
                 ))}
               </div>              
               {/* TESTING SVG RENDERING */}
-              {
+              {/* {
                 cardRenderInfo.length > 0 &&
                 <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardRenderInfo[0].html, design?.styles||'')}} />
-              }
+              } */}
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>

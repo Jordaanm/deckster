@@ -27,7 +27,7 @@ export interface RenderInfo {
 
 export const buildSVGData = (html: string, css: string): string => {
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="640" height="890" viewbox="0 0 320 445">
+    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="640px" height="890px" viewbox="0 0 320 445">
       <foreignObject x="0" y="0" width="640" height="890">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%;">
           <style>${css}</style>
@@ -48,8 +48,35 @@ export const svgBlobForCard = (html: string, css: string): Blob => {
 
 type DataUrlCallback = (uri: string) => void;
 
-export const dataUrlFromImageBlob = (callback: DataUrlCallback) => (blob: Blob) => {
+export const renderBlobToCanvas = (blob: Blob, callback: (canvas: HTMLCanvasElement) => void, existingCanvas?: HTMLCanvasElement): void => {
+  const canvas = existingCanvas || document.createElement('canvas');
+  canvas.setAttribute('height', '890px');
+  canvas.setAttribute('width', '640px');
+  
+  const ctx = canvas.getContext('2d');
+  
+  const fileReader = new FileReader();
+  
+  fileReader.onload = (e: any) => {
+    const img = new Image();
+    const url = e.target.result;
+
+    img.onload = function() {
+      ctx?.drawImage(img, 0, 0);
+      callback(canvas);
+    }
+
+    img.src = url;
+
+  }
+  fileReader.readAsDataURL(blob);
+};
+
+export const dataUrlFromImageBlob = (blob: Blob, callback: DataUrlCallback) => {
   const canvas = document.createElement('canvas');
+  canvas.setAttribute('height', '100%');
+  canvas.setAttribute('width', '100%');
+  
   const ctx = canvas.getContext('2d');
   
   const fileReader = new FileReader();
