@@ -1,7 +1,7 @@
 ## TODO
 * Integrate Images
-* Change Card Back Settings in Drawer
 * Render Cards Asynchronously
-* Add option for HD render
+* Add Help Section
 * Github Project
-* Page Layout fixes
+* Bigger Header Tab Design
+* Misc UX/UI Fixes

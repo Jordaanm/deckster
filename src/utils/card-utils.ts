@@ -204,32 +204,13 @@ const intertwine = (cardBackSettings: string, front: RenderInfo[], back: RenderI
   }
 };
 
+export const saveDeckToZip = async (renderInfo: RenderInfo[], ratio: number) => {
+  const pngBlobPromises = renderInfo.map(ri => svgForCard(ri.html, ri.css))
+  .map(svg => blobForSVG(svg))
+  .map(blob => pngBlobFromSvgBlob(blob, ratio));
 
-export const generateCardData = ( design?: CardDesign, data?: any[]) => {
+  const results = await Promise.all(pngBlobPromises);
 
-  //For each row of the data set
-  const cardData = (data || []).map(datum => {
-    const newDatum = {...datum };
-    //Transform data by fieldMappings
-
-    //Return transformed data;
-    return newDatum;
-  });
-
-  const template = design?.code || '';
-
-  const renderedCardData = cardData.map(cdatum => renderCard(template, cdatum));
-
-  return renderedCardData;
-};
-
-export const saveZip = async (htmlList: string[], css: string, ratio: number) => {
-  const pngBlobPromises = htmlList
-    .map(html => svgForCard(html, css))
-    .map(svg => blobForSVG(svg))
-    .map(blob => pngBlobFromSvgBlob(blob, ratio));
-
-  const results = await Promise.all(pngBlobPromises)
   const contents = results
     .map((blob: Blob|null, index: number) => {
     if(blob!= null) {
@@ -247,4 +228,4 @@ export const saveZip = async (htmlList: string[], css: string, ratio: number) =>
 
   triggerDownload(url, 'deck.zip');
   URL.revokeObjectURL(url);
-}
+};

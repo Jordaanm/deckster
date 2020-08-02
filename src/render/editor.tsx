@@ -10,14 +10,13 @@ import { EntityStore } from '../stores/entity-store';
 import {
   triggerDownload,
   PLAYING_CARD_CSS,
-  generateCardData,
   CardBackSettings,
   RenderInfo,
   generateRenderInfo,
   renderBlobToCanvas,
   svgForCard,
   blobForSVG,
-  saveZip
+  saveDeckToZip
 } from '../utils/card-utils';
 
 import './render.scss'
@@ -77,15 +76,20 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
     const design: CardDesign|undefined = project.designs.find(config.cardDesign || undefined);
     const backDesign: CardDesign|undefined = project.designs.find(config.cardBackDesign || undefined);
 
-    const openDrawer = () => {
+
+    const updateRenderInfo = (cardBackSettings: string) => {
       const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings);
       setCardRenderInfo(renderInfo);
+    }
+
+    const openDrawer = () => {
+      updateRenderInfo(cardBackSettings);
       toggleDrawer();
     };
 
     const generateZip = () => {
-      const cardData = generateCardData(design, dataSet?.data);
-      saveZip(cardData, design?.styles||'', ratio);
+      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings);
+      saveDeckToZip(renderInfo, ratio);
     }
 
     return (
@@ -163,7 +167,31 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>
-            FOOTER
+            <div className="row">
+              <div className="col">
+                <Label>
+                  Card Back Placement
+                  <HTMLSelect value={cardBackSettings} onChange={e => { setCardBackSettings(e.target.value); updateRenderInfo(e.target.value); }}>
+                    <option value={CardBackSettings.NONE}>Don't Render Backs</option>
+                    <option value={CardBackSettings.FIRST}>Only Render The First Back</option>
+                    <option value={CardBackSettings.AFTER}>Render Backs after Faces</option>
+                    <option value={CardBackSettings.COLLATE}>Collate Card Faces and Backs</option>
+                  </HTMLSelect>
+                </Label>
+              </div>
+              <div className="col">
+                <Label>
+                  Image Scale
+                  <NumericInput value={ratio} onValueChange={setRatio} leftIcon="maximize"/>
+                </Label>
+              </div>
+              <div className="col">
+                <Label>
+                  &nbsp;
+                  <Button icon="download" text="Download as Zip File" onClick={generateZip} className="flex" />
+                </Label>
+              </div>              
+            </div>
           </div>
         </Drawer>
       </section>

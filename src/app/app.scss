@@ -42,3 +42,8 @@
 .wrap {
   flex-wrap: wrap;
 }
+
+.flex, .bp3-button.flex {
+  margin-top: 0.25em;
+  display: flex;
+}
