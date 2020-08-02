@@ -2,11 +2,7 @@
   height: 89mm;
   width: 64mm;
   font-size: 10mm;
-}
-
-foreignObject .playing-card {
-  height: 100%;
-  width: 100%;
+  box-sizing: border-box;
 }
 
 @media print {

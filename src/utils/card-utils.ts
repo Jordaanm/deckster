@@ -1,11 +1,20 @@
 import { CardDesign, DataSet } from '../stores/types';
+
 export const PLAYING_CARD_CSS = `
+*, *:before, *:after {  
+  box-sizing: border-box;
+}
+
 .playing-card {
   height: 89mm;
   width: 64mm;
   font-size: 10mm;
 }
-`;
+
+foreignObject .playing-card {
+  height: 100%;
+  width: 100%;
+}`;
 
 export const CardBackSettings = {
   NONE: "NONE",
@@ -19,16 +28,17 @@ const renderAllBacks = [
   CardBackSettings.COLLATE
 ];
 
+type DataUrlCallback = (uri: string) => void;
 
 export interface RenderInfo {
   html: string,
   css: string
 }
 
-export const buildSVGData = (html: string, css: string): string => {
+export const svgForCard = (html: string, css: string): string => {
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="640px" height="890px" viewbox="0 0 320 445">
-      <foreignObject x="0" y="0" width="640" height="890">
+    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="320px" height="445px" viewbox="0 0 320 445">
+      <foreignObject x="0" y="0" width="320px" height="445px">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%;">
           <style>${css}</style>
           <style>${PLAYING_CARD_CSS}</style>
@@ -39,43 +49,47 @@ export const buildSVGData = (html: string, css: string): string => {
   );
 };
 
-export const svgBlobForCard = (html: string, css: string): Blob => {
-  const svgData = buildSVGData(html, css);
-  var blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-
-  return blob;
+export const blobForSVG = (svg: string): Blob => {
+  return new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
 };
 
-type DataUrlCallback = (uri: string) => void;
+const createCanvas = (): HTMLCanvasElement => {
+  const canvas = document.createElement('canvas');
+  canvas.setAttribute('height', '445px');
+  canvas.setAttribute('width', '320px');
+  canvas.style.width  = canvas.width + "px";
+  canvas.style.height = canvas.height + "px";
+  return canvas;
+}
 
-export const renderBlobToCanvas = (blob: Blob, callback: (canvas: HTMLCanvasElement) => void, existingCanvas?: HTMLCanvasElement): void => {
-  const canvas = existingCanvas || document.createElement('canvas');
-  canvas.setAttribute('height', '890px');
-  canvas.setAttribute('width', '640px');
-  
-  const ctx = canvas.getContext('2d');
-  
-  const fileReader = new FileReader();
-  
-  fileReader.onload = (e: any) => {
-    const img = new Image();
-    const url = e.target.result;
 
-    img.onload = function() {
-      ctx?.drawImage(img, 0, 0);
-      callback(canvas);
+export const renderBlobToCanvas = (blob: Blob, existingCanvas?: HTMLCanvasElement): Promise<HTMLCanvasElement> => {
+
+  return new Promise<HTMLCanvasElement>((resolve) => {
+    const canvas = existingCanvas || createCanvas();  
+    const ctx = canvas.getContext('2d');
+    
+    const fileReader = new FileReader();  
+    fileReader.onload = (e: any) => {
+      const img = new Image();
+      console.log("img.naturalWidth", img.naturalWidth, canvas.clientWidth, canvas.width); 
+      const url = e.target.result;
+  
+      img.onload = function() {
+        // ctx?.scale(2, 2);
+        ctx?.drawImage(img, 0, 0);
+        resolve(canvas);
+      }
+  
+      img.src = url; 
     }
-
-    img.src = url;
-
-  }
-  fileReader.readAsDataURL(blob);
+    
+    fileReader.readAsDataURL(blob);
+  });
 };
 
 export const dataUrlFromImageBlob = (blob: Blob, callback: DataUrlCallback) => {
-  const canvas = document.createElement('canvas');
-  canvas.setAttribute('height', '100%');
-  canvas.setAttribute('width', '100%');
+  const canvas = createCanvas()
   
   const ctx = canvas.getContext('2d');
   
@@ -101,8 +115,8 @@ export const dataUrlFromImageBlob = (blob: Blob, callback: DataUrlCallback) => {
 };
 
 export const pngBlobFromSvgBlob = (blob: Blob):  Promise<Blob|null> => {
-  return new Promise<Blob|null>((resolve, reject) => {
-    const canvas = document.createElement('canvas');
+  return new Promise<Blob|null>((resolve) => {
+    const canvas = createCanvas()
     const ctx = canvas.getContext('2d');
     
     const fileReader = new FileReader();

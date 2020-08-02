@@ -6,7 +6,7 @@ import { IStores } from '../stores/index';
 import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
-import { svgBlobForCard, triggerDownload, PLAYING_CARD_CSS, pngBlobFromSvgBlob, generateCardData, CardBackSettings, RenderInfo, generateRenderInfo, renderBlobToCanvas } from '../utils/card-utils';
+import { triggerDownload, PLAYING_CARD_CSS, pngBlobFromSvgBlob, generateCardData, CardBackSettings, RenderInfo, generateRenderInfo, renderBlobToCanvas, svgForCard, blobForSVG } from '../utils/card-utils';
 import { Select } from '@blueprintjs/select';
 import { downloadZip } from 'client-zip';
 
@@ -25,20 +25,24 @@ const drawerProps = {
   title: "Card Images",
 };
 
-const saveCard = (html: string, css: string) => {
-  var blob = svgBlobForCard(html, css);
-  renderBlobToCanvas(blob, canvas => {    
-    const imgURI = canvas
-    .toDataURL('image/png')
-    .replace('image/png', 'image/octet-stream');
+const saveCard = async (html: string, css: string) => {
+  
+  const svg = svgForCard(html, css);
+  const blob = blobForSVG(svg);
 
-    triggerDownload(imgURI);
-  });
+  const canvas = await renderBlobToCanvas(blob);
+
+  const imgURI = canvas
+  .toDataURL('image/png')
+  .replace('image/png', 'image/octet-stream');
+
+  triggerDownload(imgURI);
 };
 
 const saveZip = async (htmlList: string[], css: string) => {
   const pngBlobPromises = htmlList
-    .map(html => svgBlobForCard(html, css))
+    .map(html => svgForCard(html, css))
+    .map(svg => blobForSVG(svg))
     .map(pngBlobFromSvgBlob);
 
   const results = await Promise.all(pngBlobPromises)
@@ -165,11 +169,6 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
                   </div>                    
                 ))}
               </div>              
-              {/* TESTING SVG RENDERING */}
-              {/* {
-                cardRenderInfo.length > 0 &&
-                <div className="playing-card" dangerouslySetInnerHTML={{ __html: buildSVGData(cardRenderInfo[0].html, design?.styles||'')}} />
-              } */}
             </div>
           </div>
           <div className={Classes.DRAWER_FOOTER}>
