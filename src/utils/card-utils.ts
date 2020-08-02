@@ -1,4 +1,8 @@
 import { CardDesign, DataSet } from '../stores/types';
+import { downloadZip } from 'client-zip';
+
+const CARD_WIDTH = 320; //5px/mm
+const CARD_HEIGHT = 445; //5px/mm
 
 export const PLAYING_CARD_CSS = `
 *, *:before, *:after {  
@@ -28,8 +32,6 @@ const renderAllBacks = [
   CardBackSettings.COLLATE
 ];
 
-type DataUrlCallback = (uri: string) => void;
-
 export interface RenderInfo {
   html: string,
   css: string
@@ -37,11 +39,11 @@ export interface RenderInfo {
 
 export const svgForCard = (html: string, css: string): string => {
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="320px" height="445px" viewbox="0 0 320 445">
+    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="320px" height="445px">
       <foreignObject x="0" y="0" width="320px" height="445px">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%;">
+         <style>${PLAYING_CARD_CSS}</style>
           <style>${css}</style>
-          <style>${PLAYING_CARD_CSS}</style>
           ${html}
         </div>
       </foreignObject>
@@ -53,31 +55,39 @@ export const blobForSVG = (svg: string): Blob => {
   return new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
 };
 
-const createCanvas = (): HTMLCanvasElement => {
+const createCanvas = (ratio: number): HTMLCanvasElement => {
   const canvas = document.createElement('canvas');
-  canvas.setAttribute('height', '445px');
-  canvas.setAttribute('width', '320px');
+
+  canvas.height = CARD_HEIGHT;
+  canvas.width = CARD_WIDTH;
   canvas.style.width  = canvas.width + "px";
   canvas.style.height = canvas.height + "px";
+
+  canvas.width *= ratio;
+  canvas.height *= ratio;
+
   return canvas;
 }
 
-
-export const renderBlobToCanvas = (blob: Blob, existingCanvas?: HTMLCanvasElement): Promise<HTMLCanvasElement> => {
+export const renderBlobToCanvas = (blob: Blob, ratio: number): Promise<HTMLCanvasElement> => {
 
   return new Promise<HTMLCanvasElement>((resolve) => {
-    const canvas = existingCanvas || createCanvas();  
+    const canvas = createCanvas(ratio);
     const ctx = canvas.getContext('2d');
     
     const fileReader = new FileReader();  
     fileReader.onload = (e: any) => {
       const img = new Image();
-      console.log("img.naturalWidth", img.naturalWidth, canvas.clientWidth, canvas.width); 
       const url = e.target.result;
-  
+      
       img.onload = function() {
-        // ctx?.scale(2, 2);
-        ctx?.drawImage(img, 0, 0);
+        ctx?.drawImage(
+          img,
+          0, 0.,
+          CARD_WIDTH, CARD_HEIGHT,
+          0, 0,
+          CARD_WIDTH * ratio, CARD_HEIGHT * ratio
+        );
         resolve(canvas);
       }
   
@@ -88,35 +98,9 @@ export const renderBlobToCanvas = (blob: Blob, existingCanvas?: HTMLCanvasElemen
   });
 };
 
-export const dataUrlFromImageBlob = (blob: Blob, callback: DataUrlCallback) => {
-  const canvas = createCanvas()
-  
-  const ctx = canvas.getContext('2d');
-  
-  const fileReader = new FileReader();
-  
-  fileReader.onload = (e: any) => {
-    const img = new Image();
-    const url = e.target.result;
-
-    img.onload = function() {
-      ctx?.drawImage(img, 0, 0);
-      var imgURI = canvas
-        .toDataURL('image/png')
-        .replace('image/png', 'image/octet-stream');
-
-      callback(imgURI);
-    }
-
-    img.src = url;
-
-  }
-  fileReader.readAsDataURL(blob);
-};
-
-export const pngBlobFromSvgBlob = (blob: Blob):  Promise<Blob|null> => {
+export const pngBlobFromSvgBlob = (blob: Blob, ratio: number):  Promise<Blob|null> => {
   return new Promise<Blob|null>((resolve) => {
-    const canvas = createCanvas()
+    const canvas = createCanvas(ratio)
     const ctx = canvas.getContext('2d');
     
     const fileReader = new FileReader();
@@ -124,9 +108,15 @@ export const pngBlobFromSvgBlob = (blob: Blob):  Promise<Blob|null> => {
     fileReader.onload = (e: any) => {
       const img = new Image();
       const url = e.target.result;
-  
+      
       img.onload = function() {
-        ctx?.drawImage(img, 0, 0);
+        ctx?.drawImage(
+          img,
+          0, 0.,
+          CARD_WIDTH, CARD_HEIGHT,
+          0, 0,
+          CARD_WIDTH * ratio, CARD_HEIGHT * ratio
+        );
         canvas.toBlob(resolve, 'image/png', 1.0);
       }
   
@@ -157,6 +147,7 @@ const renderCard = (template: string, datum: any) =>{
   const $el = document.createElement("div");
   $el.classList.add("playing-card");
   $el.innerHTML = template || '';
+
   $el.querySelectorAll('[data-fieldid]').forEach(node => {
     const key = node.getAttribute("data-fieldid");
     if(key != null) {
@@ -231,3 +222,29 @@ export const generateCardData = ( design?: CardDesign, data?: any[]) => {
 
   return renderedCardData;
 };
+
+export const saveZip = async (htmlList: string[], css: string, ratio: number) => {
+  const pngBlobPromises = htmlList
+    .map(html => svgForCard(html, css))
+    .map(svg => blobForSVG(svg))
+    .map(blob => pngBlobFromSvgBlob(blob, ratio));
+
+  const results = await Promise.all(pngBlobPromises)
+  const contents = results
+    .map((blob: Blob|null, index: number) => {
+    if(blob!= null) {
+      return {
+        name: `card${index}.png`,
+        input: blob as Blob
+      };
+    } else {
+      return null;
+    }
+  }).filter(x => x !== null);
+
+  const blob = await downloadZip([...contents]).blob();
+  const url = URL.createObjectURL(blob);
+
+  triggerDownload(url, 'deck.zip');
+  URL.revokeObjectURL(url);
+}

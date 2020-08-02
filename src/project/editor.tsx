@@ -73,7 +73,6 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = (props) => {
               <Label>
                 Autosave Period
                 <Slider value={project.autosavePeriod} min={15} max={360} onChange={val => project.updateAutosavePeriod(val)} intent={Intent.PRIMARY} labelStepSize={30} />
-                {/* <NumericInput value={(project.autosavePeriod || 0).toString()} onValueChange={val => project.updateAutosavePeriod(val)} leftIcon="stopwatch" large={true} /> */}
               </Label>
             </FormGroup>
           </div>       

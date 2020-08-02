@@ -1,14 +1,24 @@
 import * as React from 'react';
 import { useObserver } from 'mobx-react-lite';
-import { H2, EditableText, Button, ButtonGroup, MenuItem, Drawer, Classes, Label, HTMLSelect } from '@blueprintjs/core';
+import { H2, EditableText, Button, ButtonGroup, MenuItem, Drawer, Classes, Label, HTMLSelect, NumericInput } from '@blueprintjs/core';
+import { Select } from '@blueprintjs/select';
 import { Render, CardDesign, DataSet, IEntity } from '../stores/types';
 import { IStores } from '../stores/index';
 import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
-import { triggerDownload, PLAYING_CARD_CSS, pngBlobFromSvgBlob, generateCardData, CardBackSettings, RenderInfo, generateRenderInfo, renderBlobToCanvas, svgForCard, blobForSVG } from '../utils/card-utils';
-import { Select } from '@blueprintjs/select';
-import { downloadZip } from 'client-zip';
+import {
+  triggerDownload,
+  PLAYING_CARD_CSS,
+  generateCardData,
+  CardBackSettings,
+  RenderInfo,
+  generateRenderInfo,
+  renderBlobToCanvas,
+  svgForCard,
+  blobForSVG,
+  saveZip
+} from '../utils/card-utils';
 
 import './render.scss'
 
@@ -25,12 +35,12 @@ const drawerProps = {
   title: "Card Images",
 };
 
-const saveCard = async (html: string, css: string) => {
+const saveCard = async (html: string, css: string, ratio: number) => {
   
   const svg = svgForCard(html, css);
   const blob = blobForSVG(svg);
 
-  const canvas = await renderBlobToCanvas(blob);
+  const canvas = await renderBlobToCanvas(blob, ratio);
 
   const imgURI = canvas
   .toDataURL('image/png')
@@ -39,32 +49,6 @@ const saveCard = async (html: string, css: string) => {
   triggerDownload(imgURI);
 };
 
-const saveZip = async (htmlList: string[], css: string) => {
-  const pngBlobPromises = htmlList
-    .map(html => svgForCard(html, css))
-    .map(svg => blobForSVG(svg))
-    .map(pngBlobFromSvgBlob);
-
-  const results = await Promise.all(pngBlobPromises)
-  const contents = results
-    .map((blob: Blob|null, index: number) => {
-    if(blob!= null) {
-      return {
-        name: `card${index}.png`,
-        input: blob as Blob
-      };
-    } else {
-      return null;
-    }
-  }).filter(x => x !== null);
-
-  const blob = await downloadZip([...contents]).blob();
-  const url = URL.createObjectURL(blob);
-
-  triggerDownload(url, 'deck.zip');
-  URL.revokeObjectURL(url);
-}
-
 export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
 
   const stores: IStores = useStores();
@@ -72,6 +56,7 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
   const [showDrawer, setShowDrawer] = React.useState<Boolean>(false);
 
   const [cardBackSettings, setCardBackSettings] = React.useState<string>(CardBackSettings.COLLATE);
+  const [ratio, setRatio] = React.useState<number>(1);
   const [cardRenderInfo, setCardRenderInfo] = React.useState<RenderInfo[]>([]);
 
   return useObserver(() => {
@@ -100,7 +85,7 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
 
     const generateZip = () => {
       const cardData = generateCardData(design, dataSet?.data);
-      saveZip(cardData, design?.styles||'');
+      saveZip(cardData, design?.styles||'', ratio);
     }
 
     return (
@@ -143,6 +128,12 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
             </Label>
           </div>
           <div className="row">
+            <Label>
+              Image Scale
+              <NumericInput value={ratio} onValueChange={setRatio} leftIcon="maximize"/>
+            </Label>
+          </div>
+          <div className="row">
             <Button onClick={openDrawer}>Generate Cards</Button>
           </div>
         </div>
@@ -161,7 +152,7 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
                 {cardRenderInfo.map((x: RenderInfo, i: number) => (
                   <div className="hover-actions-container" key={i}>
                     <div className="hover-actions">
-                      <Button icon="download" onClick={() => saveCard(x.html, x.css)} >
+                      <Button icon="download" onClick={() => saveCard(x.html, x.css, ratio)} >
                         Download
                       </Button>
                     </div>
