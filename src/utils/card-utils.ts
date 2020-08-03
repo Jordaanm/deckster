@@ -1,8 +1,10 @@
 import { CardDesign, DataSet } from '../stores/types';
 import { downloadZip } from 'client-zip';
+import { ImageStore } from '../stores/image-store';
 
 const CARD_WIDTH = 320; //5px/mm
 const CARD_HEIGHT = 445; //5px/mm
+const imageRegex = /!\[(\w*)(?:\|(.*))?\]/g;
 
 export const PLAYING_CARD_CSS = `
 *, *:before, *:after {  
@@ -142,7 +144,7 @@ export const triggerDownload = (imgURI: string, filename: string = 'card.png') =
   a.dispatchEvent(evt);
 };
 
-const renderCard = (template: string, datum: any) =>{
+const renderCard = (template: string, datum: any, imageStore: ImageStore) =>{
   //Render into template
   const $el = document.createElement("div");
   $el.classList.add("playing-card");
@@ -156,14 +158,28 @@ const renderCard = (template: string, datum: any) =>{
     }
   });
 
-  return $el.outerHTML;
+  var result = $el.outerHTML;
+
+
+  //Image Replacement
+  var match = null;
+  while ((match = imageRegex.exec(result)) !== null) {
+    const [full, name, className] = match;
+    const image = imageStore.items.find(x => x.name === name);
+    if (image) {
+      const replacement = `<img src="${image?.data}" class="${className||''}"/>`;
+      result = result.replace(full, replacement);
+    }
+  }
+
+  return result;
 }
 
 const toRenderInfo = (htmls: string[], css: string): RenderInfo[] => {
   return htmls.map(html => ({html, css}));
 }
 
-export const generateRenderInfo = (design?: CardDesign, backDesign?: CardDesign, dataSet?: DataSet, cardBackSettings: string = CardBackSettings.NONE): RenderInfo[] => {
+export const generateRenderInfo = (design: CardDesign|undefined, backDesign: CardDesign|undefined, dataSet: DataSet|undefined, cardBackSettings: string, imageStore: ImageStore ): RenderInfo[] => {
   const data = dataSet?.data || [];
   const cardData = (data || []).map(datum => {
     const newDatum = {...datum };
@@ -176,14 +192,14 @@ export const generateRenderInfo = (design?: CardDesign, backDesign?: CardDesign,
   const template = design?.code || '';
   const backTemplate = backDesign?.code || '';
 
-  const frontCards = cardData.map(cdatum => renderCard(template, cdatum))
+  const frontCards = cardData.map(cdatum => renderCard(template, cdatum, imageStore))
 
   let backCards: string[] = [];
   
   if (renderAllBacks.includes(cardBackSettings)) {
-    backCards = cardData.map(cdatum => renderCard(backTemplate, cdatum))
+    backCards = cardData.map(cdatum => renderCard(backTemplate, cdatum, imageStore))
   } else if (cardBackSettings === CardBackSettings.FIRST) {
-    backCards = [renderCard(backTemplate, cardData[0])];
+    backCards = [renderCard(backTemplate, cardData[0], imageStore)];
   }
   
   const frontRenderInfo = toRenderInfo(frontCards, design?.styles || '');

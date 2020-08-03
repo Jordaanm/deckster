@@ -78,7 +78,7 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
 
 
     const updateRenderInfo = (cardBackSettings: string) => {
-      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings);
+      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings, project.images);
       setCardRenderInfo(renderInfo);
     }
 
@@ -88,7 +88,7 @@ export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
     };
 
     const generateZip = () => {
-      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings);
+      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings, project.images);
       saveDeckToZip(renderInfo, ratio);
     }
 

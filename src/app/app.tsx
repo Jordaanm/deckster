@@ -30,7 +30,7 @@ const AppContainer: React.FC = () => {
           <Tab id='data' title='Data Sets' panel={<DataSets />} />
           <Tab id='images' title='Images' panel={<Images />} />
           <Tab id='transform' title='Transforms' panel={<Transforms />} />
-          <Tab id='generateConfigs' title='Card Sets' panel={<GenerateConfigPage />} />
+          <Tab id='generateConfigs' title='Render Cards' panel={<GenerateConfigPage />} />
         </Tabs>
       </div>
     );
