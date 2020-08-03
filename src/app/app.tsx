@@ -62,7 +62,7 @@ const AppContainer: React.FC = () => {
             <Tab id='transform' title='Transforms' panel={<Transforms />} />
             <Tab id='generateConfigs' title='Render Cards' panel={<GenerateConfigPage />} />
           </Tabs>
-          <Toaster ref={toaster => setToaster(toaster)} />
+          <Toaster ref={toaster => setToaster(toaster)} position="bottom-right" />
         </div>
       </HotKeys>
     );
