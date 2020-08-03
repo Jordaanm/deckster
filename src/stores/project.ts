@@ -7,6 +7,8 @@ import { TransformStore } from './transform-store';
 import { EntityStore } from './entity-store';
 import { ImageStore } from "./image-store";
 import { RenderStore } from './render-store';
+import { fileLoader } from './util';
+import FileSaver from 'file-saver';
 
 export class Project {
   static LOCALSTORAGE_KEY = "project";
@@ -57,6 +59,35 @@ export class Project {
       }
     }
     return new Project();
+  }
+
+  public importFile() {
+    let project = this;
+    let $input = document.createElement('input');
+    $input.type = 'file';
+    $input.onchange = fileLoader((result: string|ArrayBuffer|null) => {
+      const data = result?.toString();
+      if(data) {
+        const json = JSON.parse(atob(data.substr(29)));
+        const newProject: Project = Project.loadFromJson(json);
+        project.loadFromProject(newProject);
+      }
+    });
+
+    $input.click();
+  }
+
+  public exportToFile() {
+    var json = this.serialise();
+    var blob = new Blob([json], {type: 'application/json;charset=utf-8'});
+
+    FileSaver.saveAs(blob, 'project.json');
+  }
+
+  public toggleAutosave(): boolean {
+    const val = !this.enableAutosave
+    this.enableAutosave = val;
+    return val;
   }
 
   public loadFromProject(project: Project) {
