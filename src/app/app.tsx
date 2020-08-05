@@ -3,6 +3,7 @@ import { Tab, Tabs, Toaster, Intent } from '@blueprintjs/core';
 import { useObserver } from 'mobx-react-lite';
 import { HotKeys } from 'react-hotkeys';
 
+import { Project } from '../stores/project';
 import { useStores } from '../stores/util';
 import { DataSets } from '../data-set/page';
 import { CardDesigns } from '../design/page';
@@ -10,13 +11,13 @@ import { Images } from '../image/page';
 import { Transforms } from '../transform/page';
 import { GenerateConfigPage } from '../render/page';
 import { ProjectPage } from '../project/page';
+import { HelpPage } from '../help/page';
 
 import './app.scss';
 import './print.scss';
 import "@blueprintjs/table/lib/css/table.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
-import { Project } from '../stores/project';
-import { HelpPage } from '../help/page';
+import { TabTitle } from './tab-title';
 
 const keyMap = {
   SAVE_PROJECT: "alt+s",
@@ -55,13 +56,27 @@ const AppContainer: React.FC = () => {
       <HotKeys keyMap={keyMap} handlers={handlers} className="full-xy">
         <div className="app-container bp3-dark">
           <Tabs id='AppToolbarTabs' onChange={tabChange} selectedTabId={project.currentSection} className="full-xy">
-            <Tab id='project' title='Project' panel={<ProjectPage />} />
-            <Tab id='design' title='Card Designs' panel={<CardDesigns />} />
-            <Tab id='data' title='Data Sets' panel={<DataSets />} />
-            <Tab id='images' title='Images' panel={<Images />} />
-            <Tab id='transform' title='Transforms' panel={<Transforms />} />
-            <Tab id='generateConfigs' title='Render Cards' panel={<GenerateConfigPage />} />
-            <Tab id="help" title="Help" panel={<HelpPage />} />
+            <Tab id='project' panel={<ProjectPage />}>
+              <TabTitle label="Project" icon="projects" />
+            </Tab>
+            <Tab id='design' panel={<CardDesigns />} >
+              <TabTitle label="Card Designs" icon="page-layout" />
+            </Tab>
+            <Tab id='data' panel={<DataSets />} >
+              <TabTitle label="Data Sets" icon="th" />
+            </Tab>
+            <Tab id='images' panel={<Images />} >
+              <TabTitle label="Images" icon="media" />
+            </Tab>
+            <Tab id='transform' panel={<Transforms />} >
+              <TabTitle label="Transforms" icon="flows" />
+            </Tab>
+            <Tab id='generateConfigs' panel={<GenerateConfigPage />} >
+              <TabTitle label="Render Cards" icon="layers" />
+            </Tab>
+            <Tab id="help" panel={<HelpPage />} >
+              <TabTitle label="Help" icon="help" />
+            </Tab>
           </Tabs>
           <Toaster ref={toaster => setToaster(toaster)} position="bottom-right" />
         </div>
