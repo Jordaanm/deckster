@@ -16,6 +16,7 @@ import './print.scss';
 import "@blueprintjs/table/lib/css/table.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
 import { Project } from '../stores/project';
+import { HelpPage } from '../help/page';
 
 const keyMap = {
   SAVE_PROJECT: "alt+s",
@@ -41,7 +42,6 @@ const AppContainer: React.FC = () => {
   return useObserver(() => {
     const tabChange = (id: string) => project.currentSection = id;
     const toggleAutosave = () => {
-      console.log("A");
       const isOn = project.toggleAutosave();
       toaster?.show({
         intent: Intent.PRIMARY,
@@ -61,6 +61,7 @@ const AppContainer: React.FC = () => {
             <Tab id='images' title='Images' panel={<Images />} />
             <Tab id='transform' title='Transforms' panel={<Transforms />} />
             <Tab id='generateConfigs' title='Render Cards' panel={<GenerateConfigPage />} />
+            <Tab id="help" title="Help" panel={<HelpPage />} />
           </Tabs>
           <Toaster ref={toaster => setToaster(toaster)} position="bottom-right" />
         </div>
