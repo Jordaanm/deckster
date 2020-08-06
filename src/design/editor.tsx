@@ -14,10 +14,6 @@ interface DesignEditorProps {
   design?:  CardDesign;
 }
 
-const enterEditMode = (host: HTMLElement) => {
-  host.classList.add('edit-mode');
-}
-
 export const DesignEditor: React.FC<DesignEditorProps> = props => {
 
   const stores: IStores = useStores();
@@ -45,9 +41,6 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
 
     const onSvgLoaded = ($div: HTMLDivElement|null) => {
       setSvgHost($div);
-      // setTimeout(() => {
-      //   scanForFields($div);
-      // }, 1000);
     }
 
     const scanForFields = (svgHost: HTMLDivElement|null) => {
@@ -65,19 +58,12 @@ export const DesignEditor: React.FC<DesignEditorProps> = props => {
       project.designs.remove(design.id);      
     }
 
-    const tagElement = () => {
-      if(svgHost !== null) {
-        enterEditMode(svgHost);
-      }
-    }
-
     return (
       <section className="row editor">
         <div className="f1 col">
           <div className="row">
             <H2><EditableText onChange={changeName} value={design.name} /></H2>
             <Button icon="delete" text="Remove this Design" onClick={removeDesign} />
-            <Button icon="search-template" text="Tag Section" onClick={tagElement} />
           </div>
           <div className="col full-y f1">
             <div className="col f1">

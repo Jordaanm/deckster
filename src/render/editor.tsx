@@ -8,20 +8,24 @@ import { useStores } from '../stores/util';
 import { defaultEntityItemRenderer } from '../app/entity-select';
 import { EntityStore } from '../stores/entity-store';
 import {
-  triggerDownload,
   PLAYING_CARD_CSS,
   CardBackSettings,
   RenderInfo,
   generateRenderInfo,
-  renderBlobToCanvas,
-  svgForCard,
-  blobForSVG,
-  saveDeckToZip
+  svgForCard
 } from '../utils/card-utils';
+import {
+  triggerDownload,
+  saveDeckToZip
+} from '../utils/file-utils';
+import {  
+  renderBlobToCanvas,
+  blobForSVG
+} from '../utils/render-utils';
 
 import './render.scss'
 
-interface RenderEditorProps {
+interface DeckRenderEditorProps {
   config?: Render;
 };
 
@@ -48,7 +52,7 @@ const saveCard = async (html: string, css: string, ratio: number) => {
   triggerDownload(imgURI);
 };
 
-export const RenderEditor: React.FC<RenderEditorProps> = (props) => {
+export const DeckRenderEditor: React.FC<DeckRenderEditorProps> = (props) => {
 
   const stores: IStores = useStores();
   const { project } = stores;

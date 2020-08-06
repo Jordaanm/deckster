@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Icon, IconName, Intent } from '@blueprintjs/core';
+import { Icon, IconName } from '@blueprintjs/core';
 
 interface TabTitleProps {
   label: string,

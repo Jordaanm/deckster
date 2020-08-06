@@ -1,6 +1,5 @@
 ## TODO
 * Data Transforms
-  * Help -> Help
-* Github Project
+* Fix Readme.md
 * Offline Capable
-* Misc UX/UI Fixes
+* Github Project

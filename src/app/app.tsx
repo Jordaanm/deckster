@@ -9,7 +9,7 @@ import { DataSets } from '../data-set/page';
 import { CardDesigns } from '../design/page';
 import { Images } from '../image/page';
 import { Transforms } from '../transform/page';
-import { GenerateConfigPage } from '../render/page';
+import { DeckRenderPage } from '../render/page';
 import { ProjectPage } from '../project/page';
 import { HelpPage } from '../help/page';
 
@@ -71,7 +71,7 @@ const AppContainer: React.FC = () => {
             <Tab id='transform' panel={<Transforms />} >
               <TabTitle label="Transforms" icon="flows" />
             </Tab>
-            <Tab id='generateConfigs' panel={<GenerateConfigPage />} >
+            <Tab id='generateConfigs' panel={<DeckRenderPage />} >
               <TabTitle label="Render Cards" icon="layers" />
             </Tab>
             <Tab id="help" panel={<HelpPage />} >
