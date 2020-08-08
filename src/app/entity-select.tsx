@@ -20,21 +20,31 @@ export const defaultEntityItemRenderer: ItemRenderer<IEntity> = (item, { handleC
   );
 };
 
-export const entitySelect = <T extends IEntity = IEntity>(store: EntityStore<T>, itemRendererOverride?: ItemRenderer<T>) => {
+interface IEntitySelectOverrides<T> {
+  itemRenderer?: ItemRenderer<T>;
+  onItemSelect?: (item: T) => void;
+  getActiveItem?: () => T|undefined;
+  className?: string;
+}
+
+export const entitySelect = <T extends IEntity = IEntity>(store: EntityStore<T>, overrides?: IEntitySelectOverrides<T>) => {
   const EntitySelect = Select.ofType<T>();
   const currentItem = store.currentItem;
+  const defaultItemSelect = (item: IEntity) => store.currentlySelectedID = item.id;
   const selectText = currentItem ? currentItem.name : 'Nothing Selected';
-  const onItemSelect = (item: IEntity) => store.currentlySelectedID = item.id;
 
-  const itemRenderer = itemRendererOverride || defaultEntityItemRenderer;
+  const onItemSelect = overrides?.onItemSelect || defaultItemSelect;
+  const itemRenderer = overrides?.itemRenderer || defaultEntityItemRenderer;
+  const activeItem = (overrides?.getActiveItem && overrides.getActiveItem()) || currentItem;
 
   return (
     <EntitySelect
+    className={overrides?.className}
     items={store.items}
     itemRenderer={itemRenderer}
     noResults={<MenuItem disabled={true} text="None Added" />}
     onItemSelect={onItemSelect}
-    activeItem={currentItem}
+    activeItem={activeItem}
   >        
     <Button text={selectText} rightIcon="double-caret-vertical" />
   </EntitySelect>    

@@ -24,6 +24,7 @@ import {
 } from '../utils/render-utils';
 
 import './render.scss'
+import { FieldTransformView } from './field-transforms';
 
 interface DeckRenderEditorProps {
   config?: Render;
@@ -123,6 +124,12 @@ export const DeckRenderEditor: React.FC<DeckRenderEditorProps> = (props) => {
               Data Set
               {configEntitySelect(project.datasets, setDataSet, dataSet)}
             </Label>         
+          </div>
+          <div className="row">
+            <Label>
+              Transforms
+              <FieldTransformView deck={config} />
+            </Label>
           </div>
           <div className="row">
             <Label>

@@ -30,7 +30,7 @@ export const Transforms: React.FC = () => {
         <div className="col">
           <div className="row">
             <ControlGroup fill={true}>
-              {entitySelect<Transform>(project.transforms, renderTxOption)}
+              {entitySelect<Transform>(project.transforms, {itemRenderer: renderTxOption})}
               <Button icon="add" text="Add New Transform" onClick={addNewTx} />
             </ControlGroup>
           </div>

@@ -35,3 +35,12 @@ export const repeat: TxOperation = {
   paramNames: ['text'],
   pipe: (value, params) => (new Array(value)).map(() => params[0]).join('')
 }
+
+export const toUpper: TxOperation = {
+  name: 'To Uppercase',
+  description: 'Converts a string to uppercase',
+  input: TxType.STRING,
+  output: TxType.STRING,
+  paramNames: [],
+  pipe: (value) => value.toString().toUpperCase()
+}

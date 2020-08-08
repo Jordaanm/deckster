@@ -29,13 +29,17 @@ html, body, #root, .app {
 .row {
   display: flex;
   flex-direction: row;
-  margin-top: 0.5em;
+  &>* {
+    margin-right: 0.5em;
+  }
 }
 
 .col {
   display: flex;
   flex-direction: column;
-  margin-left: 0.5em;
+  &>* {
+    margin-bottom: 0.5em;
+  }
 }
 
 .f1 {
@@ -52,6 +56,10 @@ html, body, #root, .app {
 
 .full-y {
   height: 100%;
+}
+
+.space-between {
+  justify-content: space-between;
 }
 
 .full-xy {
