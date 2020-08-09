@@ -20,7 +20,7 @@ export const ProjectPage: React.FC = () => {
       <section className="app-section project">
         <H1>Project</H1>
         <Helmet>
-          <title>{project?.name||''} - Card Generator</title>
+          <title>{project?.name||''} - Deckster CCG</title>
         </Helmet>
         <div className="row">
           <ProjectEditor project={project}/>
