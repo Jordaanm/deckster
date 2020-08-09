@@ -1,6 +1,8 @@
-import { CardDesign, DataSet } from '../stores/types';
+import { CardDesign, DataSet, FieldTransformIds, TxStep } from '../stores/types';
 import { ImageStore } from '../stores/image-store';
-
+import { Project } from '../stores/project';
+import { TransformStore } from '../stores/transform-store';
+import * as TxOperations from '../transform/tx-ops';
 const imageRegex = /!\[(\w*)(?:\|(.*))?\]/g;
 
 export const PLAYING_CARD_CSS = `
@@ -85,11 +87,38 @@ const toRenderInfo = (htmls: string[], css: string): RenderInfo[] => {
   return htmls.map(html => ({html, css}));
 }
 
-export const generateRenderInfo = (design: CardDesign|undefined, backDesign: CardDesign|undefined, dataSet: DataSet|undefined, cardBackSettings: string, imageStore: ImageStore ): RenderInfo[] => {
+const getTxOperation = (txStep: TxStep) => {
+  return Object.values(TxOperations).find(x => x.name === txStep.operation.name);
+}
+
+const applyTransform = (object: any, field: string, transformId: string, txStore: TransformStore) => {
+  const transform = txStore.find(transformId);
+  let value = object[field];
+  if(typeof value === 'undefined') { return ''; }
+
+  if(transform) {
+    transform.steps.forEach(txStep => {
+      const actualOp = getTxOperation(txStep);
+      if(actualOp) {
+        value = actualOp.pipe(value, txStep.params);
+      }
+    });
+    object[field] = value;
+  }
+}
+
+export const generateRenderInfo = (design: CardDesign|undefined, backDesign: CardDesign|undefined, dataSet: DataSet|undefined, fieldTx: FieldTransformIds[], cardBackSettings: string, project: Project): RenderInfo[] => {
+  const imageStore = project.images;
+  const txStore = project.transforms;
+
   const data = dataSet?.data || [];
   const cardData = (data || []).map(datum => {
     const newDatum = {...datum };
     //Transform data by fieldMappings
+    fieldTx.forEach(fieldTransform => {
+      const {field, transform} = fieldTransform;
+      applyTransform(newDatum, field, transform, txStore);
+    });
 
     //Return transformed data;
     return newDatum;

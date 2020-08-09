@@ -83,7 +83,7 @@ export const DeckRenderEditor: React.FC<DeckRenderEditorProps> = (props) => {
 
 
     const updateRenderInfo = (cardBackSettings: string) => {
-      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings, project.images);
+      const renderInfo = generateRenderInfo(design, backDesign, dataSet, config.fieldTransforms, cardBackSettings, project);
       setCardRenderInfo(renderInfo);
     }
 
@@ -93,7 +93,7 @@ export const DeckRenderEditor: React.FC<DeckRenderEditorProps> = (props) => {
     };
 
     const generateZip = () => {
-      const renderInfo = generateRenderInfo(design, backDesign, dataSet, cardBackSettings, project.images);
+      const renderInfo = generateRenderInfo(design, backDesign, dataSet, config.fieldTransforms, cardBackSettings, project);
       saveDeckToZip(renderInfo, ratio);
     }
 
