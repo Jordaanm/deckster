@@ -1,7 +1,8 @@
 {
   "name": "deckster",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "homepage": "http://jordaanm.github.io/deckster",
   "dependencies": {
     "@babel/core": "7.9.0",
     "@blueprintjs/core": "^3.28.2",
